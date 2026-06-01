@@ -39,6 +39,11 @@ public class User implements UserDetails {
     private Double locationLat;
     private Double locationLng;
 
+    // Tanzania Administrative Location
+    private String region;   // e.g. Dar es Salaam
+    private String district; // e.g. Ilala
+    private String ward;     // e.g. Gerezani
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;

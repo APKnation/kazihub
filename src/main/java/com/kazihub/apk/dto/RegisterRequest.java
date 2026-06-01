@@ -16,5 +16,8 @@ public class RegisterRequest {
     private String password;
     private Double locationLat;
     private Double locationLng;
+    private String region;   // Tanzania Region (e.g. Dar es Salaam)
+    private String district; // Tanzania District (e.g. Ilala)
+    private String ward;     // Tanzania Ward (e.g. Gerezani)
     private String role; // e.g. "JOB_SEEKER", "EMPLOYER"
 }
