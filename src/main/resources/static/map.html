@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkillHub Map Integration Test</title>
+    <!-- Leaflet CSS for the map -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; background-color: #f4f7f6; }
+        .container { max-width: 1000px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        h1 { color: #2c3e50; text-align: center; }
+        #map { height: 500px; width: 100%; margin-top: 20px; border-radius: 8px; border: 2px solid #ddd; display: none; }
+        .auth-panel { background: #eef2f5; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+        input { padding: 10px; margin: 5px 0; width: calc(100% - 24px); border: 1px solid #ccc; border-radius: 4px; }
+        button { background: #3498db; color: white; border: none; padding: 10px 20px; cursor: pointer; border-radius: 4px; font-weight: bold; width: 100%; margin-top: 10px;}
+        button:hover { background: #2980b9; }
+        .controls { display: none; margin-top: 20px; }
+        #status { text-align: center; margin-top: 10px; color: #e74c3c; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🌍 SkillHub Location Map Test</h1>
+    
+    <!-- Login Panel -->
+    <div class="auth-panel" id="authPanel">
+        <h3>1. Login to Access Backend APIs</h3>
+        <p>Use the credentials of the Job Seeker or Employer you registered via Postman.</p>
+        <input type="text" id="phone" placeholder="Phone Number (e.g. 0712345678)">
+        <input type="password" id="password" placeholder="Password (e.g. password123)">
+        <button onclick="login()">Login & Load Map</button>
+        <div id="status"></div>
+    </div>
+
+    <!-- Map Controls -->
+    <div class="controls" id="mapControls">
+        <h3>2. View Nearby Jobs</h3>
+        <p>The map is centered on Dar es Salaam by default. Click the button to fetch jobs from the backend!</p>
+        <button style="background: #27ae60;" onclick="fetchNearbyJobs()">📍 Fetch Jobs Near Me</button>
+    </div>
+
+    <!-- The Map -->
+    <div id="map"></div>
+</div>
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+    let jwtToken = "";
+    let map;
+    let markersLayer;
+
+    // Default coordinates (e.g., Dar es Salaam)
+    const CURRENT_LAT = -6.7924;
+    const CURRENT_LNG = 39.2083;
+
+    function login() {
+        const phone = document.getElementById('phone').value;
+        const password = document.getElementById('password').value;
+
+        fetch('/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ phone, password })
+        })
+        .then(response => {
+            if (!response.ok) throw new Error("Login failed! Did you register this user first?");
+            return response.json();
+        })
+        .then(data => {
+            jwtToken = data.token;
+            document.getElementById('authPanel').style.display = 'none';
+            document.getElementById('mapControls').style.display = 'block';
+            document.getElementById('map').style.display = 'block';
+            initMap();
+        })
+        .catch(err => {
+            document.getElementById('status').innerText = err.message;
+        });
+    }
+
+    function initMap() {
+        // Initialize map centered at current location
+        map = L.map('map').setView([CURRENT_LAT, CURRENT_LNG], 12);
+
+        // Load free map tiles from OpenStreetMap
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Add a marker for the USER'S current location
+        L.circleMarker([CURRENT_LAT, CURRENT_LNG], { color: 'red', radius: 8 })
+            .addTo(map)
+            .bindPopup("<b>You are here!</b>").openPopup();
+
+        markersLayer = L.layerGroup().addTo(map);
+    }
+
+    function fetchNearbyJobs() {
+        if(!jwtToken) return;
+
+        // Call the backend API we just created!
+        fetch(`/api/jobs/nearby?lat=${CURRENT_LAT}&lng=${CURRENT_LNG}&radiusKm=20`, {
+            headers: { 'Authorization': 'Bearer ' + jwtToken }
+        })
+        .then(response => response.json())
+        .then(jobs => {
+            markersLayer.clearLayers();
+            
+            if(jobs.length === 0) {
+                alert("No jobs found within 20km! Try adding a job via Postman first.");
+                return;
+            }
+
+            jobs.forEach(item => {
+                const job = item.job;
+                const distance = item.distanceInKm.toFixed(2);
+                
+                // Plot each job on the map
+                const marker = L.marker([job.locationLat, job.locationLng]).addTo(markersLayer);
+                
+                // Content shown when clicking a job pin
+                marker.bindPopup(`
+                    <h3 style="margin-bottom: 5px;">${job.title}</h3>
+                    <b>Distance:</b> ${distance} km away<br>
+                    <b>Payment:</b> ${job.paymentAmount} TZS<br>
+                    <b>Status:</b> ${job.status}<br>
+                    <i>${job.description}</i>
+                `);
+            });
+            
+            alert(`Successfully loaded ${jobs.length} jobs on the map!`);
+        })
+        .catch(err => alert("Error fetching jobs: " + err));
+    }
+</script>
+
+</body>
+</html>
