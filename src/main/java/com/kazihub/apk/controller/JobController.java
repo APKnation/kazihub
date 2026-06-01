@@ -4,6 +4,7 @@ import com.kazihub.apk.model.Job;
 import com.kazihub.apk.model.JobApplication;
 import com.kazihub.apk.model.JobStatus;
 import com.kazihub.apk.service.JobService;
+import com.kazihub.apk.dto.NearbyJobResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -42,6 +43,14 @@ public class JobController {
     @GetMapping("/status/{status}")
     public ResponseEntity<List<Job>> getJobsByStatus(@PathVariable JobStatus status) {
         return ResponseEntity.ok(jobService.getJobsByStatus(status));
+    }
+
+    @GetMapping("/nearby")
+    public ResponseEntity<List<NearbyJobResponse>> getNearbyJobs(
+            @RequestParam double lat,
+            @RequestParam double lng,
+            @RequestParam(defaultValue = "10.0") double radiusKm) {
+        return ResponseEntity.ok(jobService.getNearbyJobs(lat, lng, radiusKm));
     }
 
     @PostMapping("/{jobId}/apply")

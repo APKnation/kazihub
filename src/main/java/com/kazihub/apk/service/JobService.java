@@ -10,6 +10,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Comparator;
+import java.util.stream.Collectors;
+import com.kazihub.apk.dto.NearbyJobResponse;
 
 @Service
 @RequiredArgsConstructor
@@ -17,6 +20,7 @@ public class JobService {
 
     private final JobRepository jobRepository;
     private final JobApplicationRepository jobApplicationRepository;
+    private final LocationService locationService;
 
     public Job createJob(Job job) {
         return jobRepository.save(job);
@@ -32,6 +36,18 @@ public class JobService {
 
     public List<Job> getJobsByStatus(JobStatus status) {
         return jobRepository.findByStatus(status);
+    }
+
+    public List<NearbyJobResponse> getNearbyJobs(double lat, double lng, double radiusKm) {
+        return jobRepository.findByStatus(JobStatus.OPEN).stream()
+                .filter(job -> job.getLocationLat() != null && job.getLocationLng() != null)
+                .map(job -> {
+                    double distance = locationService.calculateDistance(lat, lng, job.getLocationLat(), job.getLocationLng());
+                    return new NearbyJobResponse(job, distance);
+                })
+                .filter(response -> response.getDistanceInKm() <= radiusKm)
+                .sorted(Comparator.comparingDouble(NearbyJobResponse::getDistanceInKm))
+                .collect(Collectors.toList());
     }
 
     public Optional<Job> getJobById(Long id) {
