@@ -41,6 +41,9 @@ public class AuthService {
                 .password(passwordEncoder.encode(request.getPassword()))
                 .locationLat(request.getLocationLat())
                 .locationLng(request.getLocationLng())
+                .region(request.getRegion())
+                .district(request.getDistrict())
+                .ward(request.getWard())
                 .role(role)
                 .build();
 
@@ -53,6 +56,11 @@ public class AuthService {
                 .userId(user.getId())
                 .name(user.getName())
                 .role(user.getRole().name())
+                .region(user.getRegion())
+                .district(user.getDistrict())
+                .ward(user.getWard())
+                .locationLat(user.getLocationLat())
+                .locationLng(user.getLocationLng())
                 .build();
     }
 
@@ -74,6 +82,11 @@ public class AuthService {
                 .userId(user.getId())
                 .name(user.getName())
                 .role(user.getRole().name())
+                .region(user.getRegion())
+                .district(user.getDistrict())
+                .ward(user.getWard())
+                .locationLat(user.getLocationLat())
+                .locationLng(user.getLocationLng())
                 .build();
     }
 }

@@ -9,14 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class AuthResponse {
-    private String token;
-    private Long userId;
-    private String name;
-    private String role;
-    private String region;
-    private String district;
-    private String ward;
+public class LocationUpdateRequest {
     private Double locationLat;
     private Double locationLng;
 }
