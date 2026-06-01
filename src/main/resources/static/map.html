@@ -175,84 +175,234 @@
 //  TANZANIA LOCATION DATA
 // ─────────────────────────────────────────────
 const tanzaniaData = {
-    "Dar es Salaam": {
-        "Ilala": ["Gerezani", "Kariakoo", "Kivukoni", "Mchafukoge", "Upanga Mashariki", "Upanga Magharibi"],
-        "Kinondoni": ["Kinondoni", "Magomeni", "Mwananyamala", "Ndugumbi", "Sinza", "Kijitonyama", "Mbezi", "Kawe"],
-        "Temeke": ["Temeke", "Mbagala", "Mjimwema", "Sandali", "Kigamboni", "Somangira"],
-        "Ubungo": ["Ubungo", "Kimara", "Kibamba", "Kwembe", "Makuburi"],
-        "Kigamboni": ["Kigamboni", "Kibada", "Somangira", "Vijibweni", "Ng'ombe"]
-    },
-    "Mwanza": {
-        "Ilemela": ["Ilemela", "Buhongwa", "Igogo", "Kiloleli", "Nyamagana"],
-        "Nyamagana": ["Nyamagana", "Kirumba", "Mabatini", "Mkuyuni", "Pamba"],
-        "Kwimba": ["Ngudu", "Malampaka", "Ng'hundi", "Nzila"],
-        "Magu": ["Magu", "Buhingo", "Igalukilo", "Kabila"],
-        "Sengerema": ["Sengerema", "Busisi", "Katunguru", "Nyampande"]
-    },
     "Arusha": {
-        "Arusha City": ["Elerai", "Kimandolu", "Kitepes", "Levolosi", "Ngarenaro", "Sekei", "Sombetini", "Themi"],
-        "Meru": ["Usa River", "Ngarenanyuki", "Maji ya Chai", "Leguruki", "Sura ya Jua"],
-        "Arumeru": ["Tengeru", "Ngarenanyuki", "Kivulini", "Kikatiti"],
-        "Monduli": ["Monduli Juu", "Engaruka", "Lolkisale", "Makuyuni"],
-        "Karatu": ["Karatu", "Kambi ya Simba", "Oljoro", "Rhotia"]
+        "Arusha Jiji": ["Elerai","Engutoto","Kaloleni","Kimandolu","Kitepes","Levolosi","Ngarenaro","Oloirien","Sekei","Sombetini","Themi","Unga Ltd"],
+        "Arumeru": ["Bangata","Kikwe","Kimundo","Kivulini","Makiba","Moshono","Mulala","Ngaramtoni","Nguruwe","Nkoaranga","Nkwakwa","Olasiti","Usa River","Uwiro"],
+        "Karatu": ["Bashay","Endabash","Endamaghan","Karatu","Mbulumbulu","Mangola","Oldeani","Rhotia"],
+        "Longido": ["Engare Nairobi","Gelai Lumbwa","Gelai Meirugoi","Longido","Mateves","Ngarengiro","Orbomba"],
+        "Monduli": ["Engare Nanyuki","Engaruka","Lolkisale","Makuyuni","Monduli","Mto wa Mbu","Olokii"],
+        "Ngorongoro": ["Alailelai","Arash","Endulen","Kakesio","Loosoito","Malambo","Nainokanoka","Olbalbal","Sale","Soitsambu"]
+    },
+    "Dar es Salaam": {
+        "Ilala": ["Buguruni","Chanika","Chang'ombe","Gerezani","Ilala","Jangwani","Kariakoo","Kisutu","Kivukoni","Mchafukoge","Msongola","Mtoni","Pugu","Segerea","Tabata","Ukonga","Upanga Mashariki","Upanga Magharibi","Vingunguti"],
+        "Kinondoni": ["Bunju","Hananasifu","Kawe","Kigogo","Kijitonyama","Kinondoni","Magomeni","Makangira","Manzese","Mbezi","Mwananyamala","Mwananyamala Kisiwani","Ndugumbi","Sinza","Tandale","Wazo"],
+        "Temeke": ["Chang'ombe","Charambe","Keko","Kurasini","Mbagala","Mbagala Kuu","Miburani","Mjimwema","Mtoni","Pemba Mnazi","Sandali","Somangira","Temeke","Yombo Vituka"],
+        "Ubungo": ["Kimara","Kibamba","Kwembe","Makuburi","Mbezi Luis","Msigani","Ubungo","Uzuri"],
+        "Kigamboni": ["Kigamboni","Kibada","Ng'ombe","Somangira","Vijibweni"]
     },
     "Dodoma": {
-        "Dodoma City": ["Bihawana", "Chang'ombe", "Ipagala", "Kikombo", "Kikuyu", "Makole", "Mji Mpya"],
-        "Bahi": ["Bahi", "Chipanga", "Haubi", "Mundemu"],
-        "Chamwino": ["Chamwino", "Buigiri", "Handali", "Nzuguni"],
-        "Kondoa": ["Kondoa", "Bereko", "Haubi", "Mondo"],
-        "Mpwapwa": ["Mpwapwa", "Chunyu", "Kibakwe", "Lupeta"]
+        "Dodoma Jiji": ["Bihawana","Chang'ombe","Dodoma Makulu","Hombolo","Ipagala","Kikuyu","Kilimahewa","Kikombo","Makole","Mji Mpya","Msalato","Nala","Njedengwa","Veyula"],
+        "Bahi": ["Bahi","Bahi Sokoni","Chipanga","Haubi","Mundemu","Ntuntu"],
+        "Chamwino": ["Buigiri","Chamwino","Chipanga","Handali","Idifu","Ikowa","Matumbulu","Nzuguni"],
+        "Chemba": ["Chemba","Farkwa","Kiberashi","Kidodya","Mwakitolyo","Paranga"],
+        "Kondoa": ["Bereko","Haubi","Kolo","Kondoa","Mondo","Pahi","Salanga","Thawi"],
+        "Kongwa": ["Chakwale","Churuku","Godegode","Kibakwe","Kibaigwa","Kongwa","Msagali","Sejeli","Sonja","Zombo"],
+        "Mpwapwa": ["Chunyu","Kibakwe","Lupeta","Mpwapwa","Rudi","Mtera"]
     },
-    "Mbeya": {
-        "Mbeya City": ["Mbeya", "Iyunga", "Nsalaga", "Sisimba", "Uyole"],
-        "Rungwe": ["Tukuyu", "Bulyaga", "Kiwira", "Mwakaleli"],
-        "Chunya": ["Chunya", "Galula", "Matundasi", "Mtanila"],
-        "Kyela": ["Kyela", "Bulyaga", "Ipinda", "Masoko"],
-        "Mbarali": ["Mbarali", "Chimala", "Madibira", "Rujewa"]
-    },
-    "Tanga": {
-        "Tanga City": ["Tanga", "Chumbageni", "Makorora", "Mzingani", "Nguvumali"],
-        "Muheza": ["Muheza", "Amani", "Misalai", "Zanzibar"],
-        "Lushoto": ["Lushoto", "Mlalo", "Soni", "Vuga"],
-        "Kilosa": ["Kilosa", "Gairo", "Kimamba", "Mikumi"],
-        "Pangani": ["Pangani", "Bweni", "Mwera", "Ushongo"]
-    },
-    "Morogoro": {
-        "Morogoro City": ["Morogoro", "Bigwa", "Kichangani", "Mazimbu"],
-        "Kilosa": ["Kilosa", "Gairo", "Kimamba", "Mikumi"],
-        "Kilombero": ["Ifakara", "Lupiro", "Mlimba", "Mahenge"],
-        "Mvomero": ["Mvomero", "Dakawa", "Doma", "Mzumbe"],
-        "Ulanga": ["Mahenge", "Lupiro", "Malinyi", "Vigoi"]
-    },
-    "Kilimanjaro": {
-        "Moshi City": ["Moshi", "Mwakibete", "Njia Panda", "Pasua"],
-        "Moshi Rural": ["Kibosho", "Kilema", "Kirua", "Mamba"],
-        "Hai": ["Boma Ng'ombe", "Machame", "Masama", "Sanya"],
-        "Rombo": ["Rombo", "Mkuu", "Rongai", "Usangi"],
-        "Same": ["Same", "Gonja", "Hedaru", "Vudee"]
-    },
-    "Zanzibar North": {
-        "Kaskazini A": ["Matemwe", "Mkwajuni", "Nungwi", "Tazari"],
-        "Kaskazini B": ["Mahonda", "Mkwajuni", "Mtonini", "Pwani Mchangani"]
-    },
-    "Zanzibar South": {
-        "Kati": ["Bwejuu", "Makunduchi", "Mtende", "Paje"],
-        "Kusini": ["Jambiani", "Kizimkazi", "Makunduchi", "Mkunguni"]
-    },
-    "Zanzibar West": {
-        "Mjini": ["Mji Mkongwe", "Malindi", "Kikwajuni", "Stone Town", "Mji Mpya"],
-        "Magharibi A": ["Bububu", "Fuoni", "Kinazini", "Tunguu"],
-        "Magharibi B": ["Dimani", "Kinazini", "Mwanakwerekwe", "Pete"]
-    },
-    "Kagera": {
-        "Bukoba": ["Bukoba", "Hamugembe", "Kagondo", "Maruku"],
-        "Muleba": ["Muleba", "Biharamulo", "Kibirizi", "Nshamba"],
-        "Karagwe": ["Kayanga", "Bugene", "Kamachumu", "Nyabionza"]
+    "Geita": {
+        "Geita": ["Geita","Buzirayombo","Katoro","Lubanda","Lwamgasa","Nyabulanda"],
+        "Bukombe": ["Bukombe","Itekulwa","Lulembwe","Masumbwe","Runzewe"],
+        "Chato": ["Chato","Bwanga","Kagenyi","Kasahunga","Nansimo"],
+        "Mbogwe": ["Mbogwe","Bukakata","Iyoba","Nyakafuru","Nyamiaga"],
+        "Nyang'hwale": ["Nyang'hwale","Buzirayombo","Kahama","Nyamwigura","Nyarubele"]
     },
     "Iringa": {
-        "Iringa City": ["Iringa", "Kihesa", "Mndeme", "Wanging'ombe"],
-        "Kilolo": ["Kilolo", "Dabaga", "Kiponzelo", "Mafinga"],
-        "Mufindi": ["Mufindi", "Mafinga", "Nduli", "Nyololo"]
+        "Iringa Jiji": ["Iringa","Kihesa","Mlandege","Mndeme","Wanging'ombe"],
+        "Iringa Vijijini": ["Idodi","Kalenga","Kiponzelo","Kitwiru","Mafinga","Mapogoro","Mtwango"],
+        "Kilolo": ["Kilolo","Dabaga","Ibohora","Ilula","Lulanzi","Mtamba","Nyanzwa"],
+        "Mufindi": ["Igombavanu","Ihalimba","Ihanu","Ihowanza","Ikweha","Itandula","Kasanga","Kibengu","Kiyowela","Luhuji","Luhunga","Maduma","Mafinga","Makungu","Malangali","Mapanda","Mbalamaziwa","Mdabulo","Mninga","Mpanga Tazara","Mtambula","Mtwango","Nduli","Nyololo","Sadani","Udzungwa"]
+    },
+    "Kagera": {
+        "Bukoba Mjini": ["Bukoba","Hamugembe","Kagondo","Maruku","Nshamba"],
+        "Bukoba Vijijini": ["Butahyaije","Ibwera","Igabiro","Kakoni","Kasharunga","Kiruruma","Kitobo","Nshamba","Nsunga"],
+        "Biharamulo": ["Biharamulo","Bukiriro","Kaniha","Muganza","Runazi","Lusahunga"],
+        "Karagwe": ["Kayanga","Bugene","Kamachumu","Katoro","Murongo","Nyabionza","Ruhinda"],
+        "Kyerwa": ["Kyerwa","Bugomora","Bukiriro","Kaisho","Mataba","Murongo"],
+        "Missenyi": ["Missenyi","Bugango","Bushubi","Kanoni","Musoma","Ruhija"],
+        "Muleba": ["Muleba","Bweranyange","Goziba","Kafunzo","Kianja","Nshamba","Rubale"],
+        "Ngara": ["Ngara","Businde","Kibimba","Rulenge","Rusumo","Butare"]
+    },
+    "Katavi": {
+        "Mlele": ["Mlele","Inyonga","Isoge","Nsimbo","Mpanda Vijijini"],
+        "Mpanda Mjini": ["Mpanda","Kakese","Kibwesa","Mamba"],
+        "Mpanda Vijijini": ["Inyonga","Isoge","Karema","Kirando","Nsimbo","Ugalla"]
+    },
+    "Kigoma": {
+        "Kigoma Mjini": ["Kigoma","Bangwe","Gungu","Kagera","Katubuka","Kirando","Mwanga"],
+        "Kigoma Vijijini": ["Buhigwe","Kabogo","Kibirizi","Mwakizega","Nguruka","Simbo","Ujiji"],
+        "Buhigwe": ["Buhigwe","Kandaga","Kasaba","Kibande","Muyama","Nyamtukuza"],
+        "Kakonko": ["Kakonko","Bitale","Gwanumpu","Kasanda","Muhange"],
+        "Kibondo": ["Kibondo","Ilagala","Kizirabuyaga","Kumsenga","Murungu","Nyabibuye"],
+        "Uvinza": ["Uvinza","Igalula","Ilagala","Kalya","Kazuramimba","Malagarasi"]
+    },
+    "Kilimanjaro": {
+        "Moshi Mjini": ["Moshi","Korongoni","Mji Mpya","Njoro","Pasua","Rau"],
+        "Moshi Vijijini": ["Kibosho","Kilema","Kirua","Mamba","Machame","Old Moshi","Uru"],
+        "Hai": ["Boma Ng'ombe","Machame","Masama","Sanya","Siha"],
+        "Rombo": ["Rombo","Mkuu","Rongai","Usangi","Mamba"],
+        "Same": ["Same","Gonja","Hedaru","Kihurio","Vudee","Bwambo","Mwembe"],
+        "Mwanga": ["Mwanga","Kasighau","Kivulini","Makuyuni","Mamba","Mvure"],
+        "Siha": ["Siha","Kishisha","Lufu","Sanya Juu","Sungu"]
+    },
+    "Lindi": {
+        "Lindi Mjini": ["Lindi","Kikwetu","Kitunda","Migeregere","Mnazi Mmoja"],
+        "Lindi Vijijini": ["Kibaoni","Kilangala","Mnero","Nanguruwe"],
+        "Kilwa": ["Kilwa Masoko","Kilwa Kivinje","Mahiwa","Nanganga"],
+        "Liwale": ["Liwale","Liwale Kusini","Liwale Kaskazini","Likawage","Ndapata"],
+        "Nachingwea": ["Nachingwea","Kiegea","Lukuledi","Mbangala","Nchinga"],
+        "Ruangwa": ["Ruangwa","Chunyu","Kalole","Nanganga","Nkowe"]
+    },
+    "Manyara": {
+        "Babati Mjini": ["Babati","Bagara","Haraa","Magugu","Mamire","Mwada"],
+        "Babati Vijijini": ["Bashnet","Dabil","Gallapo","Gidas","Hirbadaw","Magara","Mamire"],
+        "Hanang": ["Hanang","Basotu","Gehandu","Gendabi","Katesh","Masakta","Warada"],
+        "Kiteto": ["Kiteto","Dosidosi","Kibaya","Kimana","Loolera","Ngorika","Partimbo"],
+        "Mbulu": ["Mbulu","Bashay","Daudi","Haydom","Inambao","Nambis","Tumati"],
+        "Simanjiro": ["Simanjiro","Emboreet","Loiborsoit","Manyara","Naberera","Sukuro"]
+    },
+    "Mara": {
+        "Musoma Mjini": ["Musoma","Buhare","Iringo","Kashumba","Mkendo","Nyakatende"],
+        "Musoma Vijijini": ["Busegwe","Butiama","Issenye","Kiabakari","Robanda","Suguti"],
+        "Bunda": ["Bunda","Bulambila","Hunyari","Kenyamonta","Nyamunigye","Shirati"],
+        "Butiama": ["Butiama","Bisarye","Kigera","Mugeta","Nyarubanda","Rwamkoma"],
+        "Rorya": ["Rorya","Bukabwa","Kenyamariga","Kirogo","Komuge","Shirati"],
+        "Serengeti": ["Serengeti","Bonchugu","Butiama","Kemondo","Kogolo","Mapera","Mugumu"],
+        "Tarime": ["Tarime","Baraki","Gorong'a","Issenye","Kenyamonta","Nyamongo"]
+    },
+    "Mbeya": {
+        "Mbeya Jiji": ["Mbeya","Iyunga","Nzovwe","Sisimba","Uyole","Iwambi","Itiji"],
+        "Mbeya Vijijini": ["Ilembo","Igawilo","Ikuti","Itamba","Lufilyo","Lufubu"],
+        "Busokelo": ["Busokelo","Bujela","Butelo","Ibula","Ilowa","Katumba","Kikondo"],
+        "Chunya": ["Chunya","Galula","Matundasi","Mtanila","Ntomoko","Nyamwanga"],
+        "Kyela": ["Kyela","Bulyaga","Ipinda","Kasumulu","Masoko","Mbaka","Muungano"],
+        "Mbarali": ["Mbarali","Chimala","Igurusi","Madibira","Rujewa","Utengule"],
+        "Rungwe": ["Tukuyu","Bujela","Bulyaga","Kiwira","Masebe","Mwakaleli","Ng'oto"]
+    },
+    "Morogoro": {
+        "Morogoro Mjini": ["Morogoro","Bigwa","Kichangani","Kiroka","Mazimbu","Mji Mpya","Mzumbe"],
+        "Morogoro Vijijini": ["Bwakira Chini","Bwakira Juu","Changarawe","Kanga","Kolero","Mgeta","Mkuyuni","Mvuha","Ngerengere","Pembamoto"],
+        "Gairo": ["Gairo","Berege","Gairo Juu","Ilakala","Kidodi"],
+        "Kilombero": ["Ifakara","Enyele","Lupiro","Mlimba","Mang'ula","Mbasa"],
+        "Kilosa": ["Kilosa","Kimamba","Kidete","Mikumi","Ulaya"],
+        "Mvomero": ["Mvomero","Doma","Hembeti","Kizuka","Mbagala","Mzumbe","Turiani"],
+        "Ulanga": ["Mahenge","Lupiro","Malinyi","Minepa","Taveta","Vigoi"]
+    },
+    "Mtwara": {
+        "Mtwara Mjini": ["Mtwara","Chikongola","Jangwani","Magomeni","Shangani","Tangazo"],
+        "Mtwara Vijijini": ["Chisonga","Chiungutwa","Mbwinji","Tandahimba"],
+        "Masasi": ["Masasi","Chigugu","Chiungutwa","Chiwale","Dihimba","Kitaya","Masasi Mjini"],
+        "Nanyumbu": ["Nanyumbu","Chigugu","Dihimba","Mkonona","Nanyumbu Mjini"],
+        "Newala": ["Newala","Chilangala","Chiponda","Chiungutwa","Likokona","Newala Mjini"],
+        "Tandahimba": ["Tandahimba","Chiungutwa","Mchichira","Mnima","Nahupa","Namikupa"]
+    },
+    "Mwanza": {
+        "Ilemela": ["Ilemela","Buhongwa","Igogo","Kiloleli","Luchelele","Nyamanoro","Sangabuye"],
+        "Nyamagana": ["Nyamagana","Butimba","Igoma","Kirumba","Mabatini","Mahina","Mkuyuni","Pamba"],
+        "Buchosa": ["Buchosa","Busweru","Chifunfu","Kabangaja","Maisome","Ng'ula"],
+        "Kwimba": ["Ngudu","Hungumalwa","Malampaka","Ng'hundi","Nzila","Sumve"],
+        "Magu": ["Magu","Buhingo","Igalukilo","Kabila","Ng'aya","Nyang'abuswa"],
+        "Misungwi": ["Misungwi","Igekemaja","Lubila","Mapilinge","Ngasamo","Usagara"],
+        "Sengerema": ["Sengerema","Busisi","Igombe","Katunguru","Nyampande","Wangama"],
+        "Ukerewe": ["Ukerewe","Galaganza","Murutunguru","Nansio","Nakatunguru"]
+    },
+    "Njombe": {
+        "Njombe Mjini": ["Njombe","Igomaa","Matembwe","Njombe Mjini","Uwemba"],
+        "Njombe Vijijini": ["Lupembe","Madeke","Mdandu","Mfumbi","Ulandoto"],
+        "Ludewa": ["Ludewa","Ikama","Litembo","Ludewa Mjini","Mkiu","Manda"],
+        "Makete": ["Makete","Bulongwa","Ibumi","Ikangalosso","Imalinyi","Ruanda"],
+        "Wanging'ombe": ["Wanging'ombe","Igosi","Kiyowela","Lupembe","Uchindile","Ufipa"]
+    },
+    "Pwani": {
+        "Kibaha Mjini": ["Kibaha","Magindu","Soga"],
+        "Kibaha Vijijini": ["Chole","Kwa Mgeni","Mlandizi","Vikindu"],
+        "Bagamoyo": ["Bagamoyo","Dunda","Fukayosi","Kaole","Kolangwa","Miono","Msata","Zinga"],
+        "Kisarawe": ["Kisarawe","Buyuni","Chanika","Kiluvya","Mafizi","Msanga","Vihingo"],
+        "Mafia": ["Mafia","Bweni","Juani","Kirongwe","Kiungu","Konde","Ndagoni"],
+        "Mkuranga": ["Mkuranga","Chenge","Kiluvya","Mkaramo","Mkuranga Mjini","Mwanambaya","Nyamisati"],
+        "Rufiji": ["Rufiji","Ikwiriri","Kibiti","Kidunda","Mbunju","Mloka","Mohoro","Salale","Utete"]
+    },
+    "Rukwa": {
+        "Sumbawanga Mjini": ["Sumbawanga","Ilemba","Katazi","Kibaoni"],
+        "Sumbawanga Vijijini": ["Chapota","Ilemba","Milepa","Muze","Nkundi","Sintali"],
+        "Kalambo": ["Kalambo","Kasanga","Matai","Mkowe","Mlowa","Nkundi"],
+        "Nkasi": ["Nkasi","Isale","Kirando","Mkoba","Nsokolo","Sintali","Wampembe"]
+    },
+    "Ruvuma": {
+        "Songea Mjini": ["Songea","Bombambili","Majengo","Mararuni","Mkunguru","Msamala","Ruvuma"],
+        "Songea Vijijini": ["Gumbiro","Ludiro","Mango","Mateka","Mbinga"],
+        "Mbinga": ["Mbinga","Amani","Kigonsera","Luhuhu","Mbinga Mjini","Mbugi","Mbasha"],
+        "Namtumbo": ["Namtumbo","Likuyu","Madaba","Mkongotema","Nambecha","Nandembo"],
+        "Nyasa": ["Nyasa","Liuli","Lituhi","Mbamba Bay","Mkali","Ndumbi"],
+        "Tunduru": ["Tunduru","Matemanga","Mbesa","Nakapanya","Nandembo","Nalasi"]
+    },
+    "Shinyanga": {
+        "Shinyanga Mjini": ["Shinyanga","Ibadakuli","Ikomwa","Kiloleli","Maore","Ngokolo","Sabasabini"],
+        "Shinyanga Vijijini": ["Bulyanhulu","Chambo","Isagehe","Kayenze","Mhango"],
+        "Kahama": ["Kahama","Bugarama","Buchambi","Kahama Mjini","Nzera","Zuberi"],
+        "Ushetu": ["Ushetu","Bulangwa","Kiloleli","Lela","Nzera","Solwa"]
+    },
+    "Simiyu": {
+        "Bariadi": ["Bariadi","Bariadi Mjini","Nguliguli","Ngasamo","Somanda","Wanzamiso"],
+        "Busega": ["Busega","Bungulwa","Kalebezo","Maganzo","Nyalikungu","Somanda"],
+        "Itilima": ["Itilima","Bupamwa","Bukundi","Mwabayanda","Nyang'homango"],
+        "Maswa": ["Maswa","Bariadi","Mwagala","Mwanhuzi","Nguliguli"],
+        "Meatu": ["Meatu","Mwakipoya","Mwamashimba","Nguliguli","Nkoma"]
+    },
+    "Singida": {
+        "Singida Mjini": ["Singida","Dung'unyi","Ipembe","Mwankoko","Nkongo","Utemini"],
+        "Singida Vijijini": ["Berege","Ipunga","Kintinku","Mihanza","Unyambwa"],
+        "Ikungi": ["Ikungi","Iguguno","Ilongero","Itigi","Kintinku","Sepuka"],
+        "Iramba": ["Iramba","Ibaga","Kinampanda","Kiomboi","Shelui","Urughu"],
+        "Manyoni": ["Manyoni","Chikuyu","Igwachanya","Mkwese","Saranda","Wembere"],
+        "Mkalama": ["Mkalama","Ihanja","Mbulu","Mudaa","Mwamapuli","Nkinto"]
+    },
+    "Songwe": {
+        "Mbozi": ["Mbozi","Fiwa","Ihango","Itaka","Mlowo","Msangano","Vwawa"],
+        "Momba": ["Momba","Chilulumo","Galula","Mzula","Ntambo","Tunduma"],
+        "Ileje": ["Ileje","Bulongo","Ibaba","Mlowo","Ndola","Ngana"],
+        "Tunduma": ["Tunduma","Chitete","Mlowo","Mwashiku","Ntambo"],
+        "Songwe": ["Songwe","Fiwa","Itaka","Mbalizi","Mji Mpya","Tunduma"]
+    },
+    "Tabora": {
+        "Tabora Mjini": ["Tabora","Cheyo","Gongoni","Isevya","Kanyenye","Malolo"],
+        "Igunga": ["Igunga","Galangwa","Igalula","Ipole","Mbutu","Puma","Shelui"],
+        "Kaliua": ["Kaliua","Ibindo","Ichemba","Igagala","Kaliua Mjini","Usoke","Usige"],
+        "Nzega": ["Nzega","Bukune","Elangwa","Goweko","Nzega Mjini","Unyiampanda"],
+        "Sikonge": ["Sikonge","Igalula","Ipole","Chaya","Ulankulu","Usoke"],
+        "Urambo": ["Urambo","Goweko","Kigwa","Ng'ombe","Sikonge","Uyumbu"],
+        "Ulyankulu": ["Ulyankulu","Igalula","Ipole","Kigwa","Sikonge","Uyumbu"]
+    },
+    "Tanga": {
+        "Tanga Jiji": ["Tanga","Chumbageni","Makorora","Manzese","Mzingani","Nguvumali","Ras Kazone"],
+        "Handeni": ["Handeni","Kiberashi","Mazingara","Mgera","Msigani","Songe"],
+        "Kilindi": ["Kilindi","Gitu","Kwamtoro","Magamba","Mgwashi","Mshewe"],
+        "Korogwe Mjini": ["Korogwe","Bungu","Kwashemshi","Mnyuzi","Mombo"],
+        "Korogwe Vijijini": ["Bungu","Kwashemshi","Mlingano","Mnyuzi","Mombo"],
+        "Lushoto": ["Lushoto","Bumbuli","Gare","Mlalo","Soni","Vuga","Woneshai"],
+        "Muheza": ["Muheza","Amani","Misalai","Mkuzi","Ubembe"],
+        "Mkinga": ["Mkinga","Gombero","Mwarongo","Kivuko","Mkinga Mjini","Potwe"],
+        "Pangani": ["Pangani","Bweni","Mwera","Pangani Mjini","Ushongo"]
+    },
+    "Mjini Magharibi": {
+        "Mjini": ["Stone Town","Mji Mkongwe","Malindi","Kikwajuni","Mji Mpya","Rahaleo","Vikokotoni","Darajani","Mlandege"],
+        "Magharibi A": ["Bububu","Fuoni","Kinazini","Kiembesamaki","Pangeni","Tunguu","Jumbi"],
+        "Magharibi B": ["Dimani","Chwaka","Koani","Mwanakwerekwe","Pete","Muungoni"]
+    },
+    "Kaskazini Unguja": {
+        "Kaskazini A": ["Matemwe","Mkwajuni","Nungwi","Kijini","Tazari","Pwani ya Mkwajuni"],
+        "Kaskazini B": ["Mahonda","Mkwajuni","Mtonini","Pwani Mchangani","Gamba","Donge","Pongwe"]
+    },
+    "Kusini Unguja": {
+        "Kati": ["Bwejuu","Makunduchi","Mtende","Paje","Cheju","Jambiani"],
+        "Kusini": ["Jambiani","Kizimkazi","Makunduchi","Mkunguni","Paje","Ukunjwi"]
+    },
+    "Kaskazini Pemba": {
+        "Micheweni": ["Micheweni","Chambani","Konde","Maziwa Ng'ombe","Njuguni","Wingwi"],
+        "Wete": ["Wete","Kangagani","Kiuyu","Ole","Pandani","Shengejuu","Tumbe"]
+    },
+    "Kusini Pemba": {
+        "Chakechake": ["Chakechake","Kibirinzi","Makoongwe","Mkoani","Ole","Pujini","Wawi"],
+        "Mkoani": ["Mkoani","Kengeja","Kibirinzi","Makombeni","Chake Chake"]
     }
 };
 

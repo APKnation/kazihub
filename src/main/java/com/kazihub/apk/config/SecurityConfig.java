@@ -18,8 +18,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
+
 @RequiredArgsConstructor
 public class SecurityConfig {
 
@@ -38,6 +42,7 @@ public class SecurityConfig {
                     "/swagger-ui.html",
                     "/map.html",          // Visual map testing page
                     "/static/**",         // All static assets
+                    "/uploads/**",        // All uploaded files (avatars, etc.)
                     "/*.html",            // All HTML files in root
                     "/*.css",
                     "/*.js"

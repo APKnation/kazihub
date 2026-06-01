@@ -39,10 +39,15 @@ public class User implements UserDetails {
     private Double locationLat;
     private Double locationLng;
 
+    @Builder.Default
+    private boolean active = true;
+
     // Tanzania Administrative Location
     private String region;   // e.g. Dar es Salaam
     private String district; // e.g. Ilala
     private String ward;     // e.g. Gerezani
+
+    private String profileImageUrl;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -75,6 +80,6 @@ public class User implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return this.active;
     }
 }

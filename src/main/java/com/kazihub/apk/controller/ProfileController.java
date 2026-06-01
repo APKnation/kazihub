@@ -3,9 +3,15 @@ package com.kazihub.apk.controller;
 import com.kazihub.apk.model.EmployerProfile;
 import com.kazihub.apk.model.JobSeekerProfile;
 import com.kazihub.apk.service.ProfileService;
+import com.kazihub.apk.model.User;
+import com.kazihub.apk.repository.UserRepository;
+import com.kazihub.apk.service.FileStorageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/profiles")
@@ -13,6 +19,8 @@ import org.springframework.web.bind.annotation.*;
 public class ProfileController {
 
     private final ProfileService profileService;
+    private final FileStorageService fileStorageService;
+    private final UserRepository userRepository;
 
     @PostMapping("/job-seeker")
     public ResponseEntity<JobSeekerProfile> saveJobSeekerProfile(@RequestBody JobSeekerProfile profile) {
@@ -36,5 +44,13 @@ public class ProfileController {
         return profileService.getEmployerProfile(userId)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PostMapping("/me/avatar")
+    public ResponseEntity<?> uploadAvatar(@AuthenticationPrincipal User user, @RequestParam("file") MultipartFile file) {
+        String fileUrl = fileStorageService.storeFile(file);
+        user.setProfileImageUrl(fileUrl);
+        userRepository.save(user);
+        return ResponseEntity.ok(Map.of("profileImageUrl", fileUrl));
     }
 }
