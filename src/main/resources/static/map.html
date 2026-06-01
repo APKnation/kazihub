@@ -1,141 +1,509 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="sw">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SkillHub Map Integration Test</title>
-    <!-- Leaflet CSS for the map -->
+    <title>SkillHub Africa – Ramani ya Kazi</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; background-color: #f4f7f6; }
-        .container { max-width: 1000px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        h1 { color: #2c3e50; text-align: center; }
-        #map { height: 500px; width: 100%; margin-top: 20px; border-radius: 8px; border: 2px solid #ddd; display: none; }
-        .auth-panel { background: #eef2f5; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
-        input { padding: 10px; margin: 5px 0; width: calc(100% - 24px); border: 1px solid #ccc; border-radius: 4px; }
-        button { background: #3498db; color: white; border: none; padding: 10px 20px; cursor: pointer; border-radius: 4px; font-weight: bold; width: 100%; margin-top: 10px;}
-        button:hover { background: #2980b9; }
-        .controls { display: none; margin-top: 20px; }
-        #status { text-align: center; margin-top: 10px; color: #e74c3c; font-weight: bold; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', sans-serif; background: #0f172a; color: #e2e8f0; min-height: 100vh; }
+
+        /* ── Top Nav ── */
+        .navbar {
+            background: linear-gradient(135deg, #1e3a5f, #0a2540);
+            padding: 14px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.4);
+        }
+        .navbar h1 { font-size: 1.3rem; font-weight: 700; color: #38bdf8; }
+        .navbar span { font-size: 0.85rem; color: #94a3b8; }
+        #user-badge { font-weight: 600; color: #4ade80; display: none; }
+
+        /* ── Tabs ── */
+        .tabs { display: flex; background: #1e293b; border-bottom: 1px solid #334155; }
+        .tab { flex: 1; padding: 14px; text-align: center; cursor: pointer; font-size: 0.9rem; color: #94a3b8; transition: all 0.2s; }
+        .tab.active { color: #38bdf8; border-bottom: 2px solid #38bdf8; font-weight: 600; }
+        .tab:hover { color: #e2e8f0; background: #263346; }
+
+        /* ── Panels ── */
+        .panel { display: none; padding: 24px; max-width: 600px; margin: 0 auto; }
+        .panel.active { display: block; }
+
+        /* ── Map Panel ── */
+        #map-panel { max-width: 100%; padding: 0; }
+        #map { height: calc(100vh - 120px); width: 100%; display: block; }
+
+        /* ── Cards / Forms ── */
+        .card { background: #1e293b; border-radius: 12px; padding: 24px; margin-bottom: 20px; border: 1px solid #334155; }
+        .card h2 { font-size: 1.1rem; font-weight: 600; color: #38bdf8; margin-bottom: 16px; }
+        label { display: block; font-size: 0.82rem; color: #94a3b8; margin-bottom: 4px; margin-top: 12px; }
+        input, select { width: 100%; padding: 10px 14px; background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: #e2e8f0; font-size: 0.9rem; transition: border 0.2s; }
+        input:focus, select:focus { outline: none; border-color: #38bdf8; }
+        select option { background: #1e293b; }
+        .btn { width: 100%; padding: 12px; border: none; border-radius: 8px; font-size: 0.95rem; font-weight: 600; cursor: pointer; margin-top: 16px; transition: all 0.2s; }
+        .btn-primary { background: linear-gradient(135deg, #0ea5e9, #3b82f6); color: white; }
+        .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+        .btn-green { background: linear-gradient(135deg, #22c55e, #16a34a); color: white; }
+        .btn-green:hover { opacity: 0.9; transform: translateY(-1px); }
+        .btn-sm { width: auto; padding: 8px 16px; font-size: 0.82rem; margin-top: 0; }
+        .alert { border-radius: 8px; padding: 10px 14px; font-size: 0.85rem; margin-top: 12px; }
+        .alert-error { background: #450a0a; border: 1px solid #dc2626; color: #fca5a5; }
+        .alert-success { background: #052e16; border: 1px solid #16a34a; color: #86efac; }
+        .gps-row { display: flex; gap: 10px; align-items: center; margin-top: 8px; }
+        .gps-row input { flex: 1; }
+        .gps-badge { font-size: 0.75rem; padding: 4px 10px; background: #0ea5e9; border-radius: 20px; color: white; cursor: pointer; white-space: nowrap; }
+        .gps-badge:hover { background: #0284c7; }
+        .gps-status { font-size: 0.75rem; color: #94a3b8; margin-top: 4px; }
+        .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid #38bdf8; border-top-color: transparent; border-radius: 50%; animation: spin 0.7s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Popup styles */
+        .leaflet-popup-content-wrapper { background: #1e293b; color: #e2e8f0; border: 1px solid #334155; border-radius: 10px; }
+        .leaflet-popup-tip { background: #1e293b; }
+        .popup-title { font-weight: 700; font-size: 1rem; color: #38bdf8; margin-bottom: 6px; }
+        .popup-detail { font-size: 0.82rem; margin: 3px 0; color: #cbd5e1; }
+        .popup-tag { display: inline-block; background: #0ea5e9; color: white; font-size: 0.7rem; padding: 2px 8px; border-radius: 20px; margin-top: 6px; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>🌍 SkillHub Location Map Test</h1>
-    
-    <!-- Login Panel -->
-    <div class="auth-panel" id="authPanel">
-        <h3>1. Login to Access Backend APIs</h3>
-        <p>Use the credentials of the Job Seeker or Employer you registered via Postman.</p>
-        <input type="text" id="phone" placeholder="Phone Number (e.g. 0712345678)">
-        <input type="password" id="password" placeholder="Password (e.g. password123)">
-        <button onclick="login()">Login & Load Map</button>
-        <div id="status"></div>
+<!-- Top Bar -->
+<div class="navbar">
+    <h1>🌍 SkillHub Africa</h1>
+    <div>
+        <span id="user-badge"></span>
+        <span id="logout-btn" style="cursor:pointer;color:#ef4444;font-size:0.82rem;display:none;" onclick="logout()"> &nbsp;Logout</span>
     </div>
+</div>
 
-    <!-- Map Controls -->
-    <div class="controls" id="mapControls">
-        <h3>2. View Nearby Jobs</h3>
-        <p>The map is centered on Dar es Salaam by default. Click the button to fetch jobs from the backend!</p>
-        <button style="background: #27ae60;" onclick="fetchNearbyJobs()">📍 Fetch Jobs Near Me</button>
+<!-- Tabs -->
+<div class="tabs">
+    <div class="tab active" id="tab-login" onclick="switchTab('login')">🔑 Ingia</div>
+    <div class="tab" id="tab-register" onclick="switchTab('register')">📝 Jisajili</div>
+    <div class="tab" id="tab-map" onclick="switchTab('map')">🗺️ Ramani</div>
+</div>
+
+<!-- ── Login Panel ── -->
+<div class="panel active" id="panel-login">
+    <div class="card">
+        <h2>Ingia kwenye Akaunti</h2>
+        <label>Nambari ya Simu</label>
+        <input type="tel" id="login-phone" placeholder="e.g. 0712345678">
+        <label>Neno la Siri</label>
+        <input type="password" id="login-password" placeholder="Neno la siri...">
+        <button class="btn btn-primary" onclick="login()">Ingia →</button>
+        <div id="login-status"></div>
     </div>
+</div>
 
-    <!-- The Map -->
+<!-- ── Register Panel ── -->
+<div class="panel" id="panel-register">
+    <div class="card">
+        <h2>Sajili Akaunti Mpya</h2>
+
+        <label>Jina Kamili</label>
+        <input type="text" id="reg-name" placeholder="Jina lako kamili">
+        <label>Nambari ya Simu</label>
+        <input type="tel" id="reg-phone" placeholder="e.g. 0712345678">
+        <label>Email (si lazima)</label>
+        <input type="email" id="reg-email" placeholder="email@mfano.com">
+        <label>Neno la Siri</label>
+        <input type="password" id="reg-password" placeholder="Neno la siri">
+        <label>Aina ya Akaunti</label>
+        <select id="reg-role">
+            <option value="JOB_SEEKER">Mtafuta Kazi (Job Seeker)</option>
+            <option value="EMPLOYER">Mwajiri (Employer)</option>
+        </select>
+
+        <!-- Tanzania Location Selection -->
+        <div style="border-top:1px solid #334155;margin-top:20px;padding-top:16px;">
+            <p style="color:#38bdf8;font-size:0.85rem;font-weight:600;margin-bottom:4px;">📍 Mahali Ulipo (Tanzania)</p>
+            <p style="color:#64748b;font-size:0.76rem;">Chagua mkoa, wilaya na kata yako</p>
+        </div>
+
+        <label>Mkoa (Region)</label>
+        <select id="reg-region" onchange="populateDistricts()">
+            <option value="">-- Chagua Mkoa --</option>
+        </select>
+
+        <label>Wilaya (District)</label>
+        <select id="reg-district" onchange="populateWards()">
+            <option value="">-- Chagua Wilaya --</option>
+        </select>
+
+        <label>Kata (Ward)</label>
+        <select id="reg-ward">
+            <option value="">-- Chagua Kata --</option>
+        </select>
+
+        <!-- GPS Coordinates (auto-detected) -->
+        <label>Kuratibu za GPS (Zinagunduliwa Kiotomatiki)</label>
+        <div class="gps-row">
+            <input type="text" id="reg-lat" placeholder="Latitudo (itagunduliwa)" readonly>
+            <input type="text" id="reg-lng" placeholder="Longitudo (itagunduliwa)" readonly>
+            <span class="gps-badge" onclick="detectGPS('reg')">📡 Gundua</span>
+        </div>
+        <div class="gps-status" id="reg-gps-status"></div>
+
+        <button class="btn btn-primary" onclick="register()">Jisajili →</button>
+        <div id="reg-status"></div>
+    </div>
+</div>
+
+<!-- ── Map Panel ── -->
+<div class="panel active" id="panel-map" style="display:none;">
+    <div id="map-controls" style="background:#1e293b;padding:12px 16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;border-bottom:1px solid #334155;">
+        <button class="btn btn-green btn-sm" onclick="fetchNearbyJobs()">📍 Tafuta Kazi Karibu Nawe</button>
+        <select id="radius-select" style="width:auto;padding:7px 12px;">
+            <option value="5">5 km</option>
+            <option value="10" selected>10 km</option>
+            <option value="20">20 km</option>
+            <option value="50">50 km</option>
+        </select>
+        <span id="map-status" style="font-size:0.8rem;color:#94a3b8;"></span>
+    </div>
     <div id="map"></div>
 </div>
 
-<!-- Leaflet JS -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-    let jwtToken = "";
-    let map;
-    let markersLayer;
+// ─────────────────────────────────────────────
+//  TANZANIA LOCATION DATA
+// ─────────────────────────────────────────────
+const tanzaniaData = {
+    "Dar es Salaam": {
+        "Ilala": ["Gerezani", "Kariakoo", "Kivukoni", "Mchafukoge", "Upanga Mashariki", "Upanga Magharibi"],
+        "Kinondoni": ["Kinondoni", "Magomeni", "Mwananyamala", "Ndugumbi", "Sinza", "Kijitonyama", "Mbezi", "Kawe"],
+        "Temeke": ["Temeke", "Mbagala", "Mjimwema", "Sandali", "Kigamboni", "Somangira"],
+        "Ubungo": ["Ubungo", "Kimara", "Kibamba", "Kwembe", "Makuburi"],
+        "Kigamboni": ["Kigamboni", "Kibada", "Somangira", "Vijibweni", "Ng'ombe"]
+    },
+    "Mwanza": {
+        "Ilemela": ["Ilemela", "Buhongwa", "Igogo", "Kiloleli", "Nyamagana"],
+        "Nyamagana": ["Nyamagana", "Kirumba", "Mabatini", "Mkuyuni", "Pamba"],
+        "Kwimba": ["Ngudu", "Malampaka", "Ng'hundi", "Nzila"],
+        "Magu": ["Magu", "Buhingo", "Igalukilo", "Kabila"],
+        "Sengerema": ["Sengerema", "Busisi", "Katunguru", "Nyampande"]
+    },
+    "Arusha": {
+        "Arusha City": ["Elerai", "Kimandolu", "Kitepes", "Levolosi", "Ngarenaro", "Sekei", "Sombetini", "Themi"],
+        "Meru": ["Usa River", "Ngarenanyuki", "Maji ya Chai", "Leguruki", "Sura ya Jua"],
+        "Arumeru": ["Tengeru", "Ngarenanyuki", "Kivulini", "Kikatiti"],
+        "Monduli": ["Monduli Juu", "Engaruka", "Lolkisale", "Makuyuni"],
+        "Karatu": ["Karatu", "Kambi ya Simba", "Oljoro", "Rhotia"]
+    },
+    "Dodoma": {
+        "Dodoma City": ["Bihawana", "Chang'ombe", "Ipagala", "Kikombo", "Kikuyu", "Makole", "Mji Mpya"],
+        "Bahi": ["Bahi", "Chipanga", "Haubi", "Mundemu"],
+        "Chamwino": ["Chamwino", "Buigiri", "Handali", "Nzuguni"],
+        "Kondoa": ["Kondoa", "Bereko", "Haubi", "Mondo"],
+        "Mpwapwa": ["Mpwapwa", "Chunyu", "Kibakwe", "Lupeta"]
+    },
+    "Mbeya": {
+        "Mbeya City": ["Mbeya", "Iyunga", "Nsalaga", "Sisimba", "Uyole"],
+        "Rungwe": ["Tukuyu", "Bulyaga", "Kiwira", "Mwakaleli"],
+        "Chunya": ["Chunya", "Galula", "Matundasi", "Mtanila"],
+        "Kyela": ["Kyela", "Bulyaga", "Ipinda", "Masoko"],
+        "Mbarali": ["Mbarali", "Chimala", "Madibira", "Rujewa"]
+    },
+    "Tanga": {
+        "Tanga City": ["Tanga", "Chumbageni", "Makorora", "Mzingani", "Nguvumali"],
+        "Muheza": ["Muheza", "Amani", "Misalai", "Zanzibar"],
+        "Lushoto": ["Lushoto", "Mlalo", "Soni", "Vuga"],
+        "Kilosa": ["Kilosa", "Gairo", "Kimamba", "Mikumi"],
+        "Pangani": ["Pangani", "Bweni", "Mwera", "Ushongo"]
+    },
+    "Morogoro": {
+        "Morogoro City": ["Morogoro", "Bigwa", "Kichangani", "Mazimbu"],
+        "Kilosa": ["Kilosa", "Gairo", "Kimamba", "Mikumi"],
+        "Kilombero": ["Ifakara", "Lupiro", "Mlimba", "Mahenge"],
+        "Mvomero": ["Mvomero", "Dakawa", "Doma", "Mzumbe"],
+        "Ulanga": ["Mahenge", "Lupiro", "Malinyi", "Vigoi"]
+    },
+    "Kilimanjaro": {
+        "Moshi City": ["Moshi", "Mwakibete", "Njia Panda", "Pasua"],
+        "Moshi Rural": ["Kibosho", "Kilema", "Kirua", "Mamba"],
+        "Hai": ["Boma Ng'ombe", "Machame", "Masama", "Sanya"],
+        "Rombo": ["Rombo", "Mkuu", "Rongai", "Usangi"],
+        "Same": ["Same", "Gonja", "Hedaru", "Vudee"]
+    },
+    "Zanzibar North": {
+        "Kaskazini A": ["Matemwe", "Mkwajuni", "Nungwi", "Tazari"],
+        "Kaskazini B": ["Mahonda", "Mkwajuni", "Mtonini", "Pwani Mchangani"]
+    },
+    "Zanzibar South": {
+        "Kati": ["Bwejuu", "Makunduchi", "Mtende", "Paje"],
+        "Kusini": ["Jambiani", "Kizimkazi", "Makunduchi", "Mkunguni"]
+    },
+    "Zanzibar West": {
+        "Mjini": ["Mji Mkongwe", "Malindi", "Kikwajuni", "Stone Town", "Mji Mpya"],
+        "Magharibi A": ["Bububu", "Fuoni", "Kinazini", "Tunguu"],
+        "Magharibi B": ["Dimani", "Kinazini", "Mwanakwerekwe", "Pete"]
+    },
+    "Kagera": {
+        "Bukoba": ["Bukoba", "Hamugembe", "Kagondo", "Maruku"],
+        "Muleba": ["Muleba", "Biharamulo", "Kibirizi", "Nshamba"],
+        "Karagwe": ["Kayanga", "Bugene", "Kamachumu", "Nyabionza"]
+    },
+    "Iringa": {
+        "Iringa City": ["Iringa", "Kihesa", "Mndeme", "Wanging'ombe"],
+        "Kilolo": ["Kilolo", "Dabaga", "Kiponzelo", "Mafinga"],
+        "Mufindi": ["Mufindi", "Mafinga", "Nduli", "Nyololo"]
+    }
+};
 
-    // Default coordinates (e.g., Dar es Salaam)
-    const CURRENT_LAT = -6.7924;
-    const CURRENT_LNG = 39.2083;
+// ─────────────────────────────────────────────
+//  AUTH STATE
+// ─────────────────────────────────────────────
+let jwtToken = null;
+let currentUser = null;
+let map = null;
+let markersLayer = null;
+let userMarker = null;
+let userLat = null;
+let userLng = null;
 
-    function login() {
-        const phone = document.getElementById('phone').value;
-        const password = document.getElementById('password').value;
+// ─────────────────────────────────────────────
+//  POPULATE DROPDOWNS
+// ─────────────────────────────────────────────
+function initDropdowns() {
+    const regionSel = document.getElementById('reg-region');
+    Object.keys(tanzaniaData).sort().forEach(r => {
+        regionSel.insertAdjacentHTML('beforeend', `<option value="${r}">${r}</option>`);
+    });
+}
 
-        fetch('/api/auth/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ phone, password })
-        })
-        .then(response => {
-            if (!response.ok) throw new Error("Login failed! Did you register this user first?");
-            return response.json();
-        })
-        .then(data => {
-            jwtToken = data.token;
-            document.getElementById('authPanel').style.display = 'none';
-            document.getElementById('mapControls').style.display = 'block';
-            document.getElementById('map').style.display = 'block';
+function populateDistricts() {
+    const region = document.getElementById('reg-region').value;
+    const distSel = document.getElementById('reg-district');
+    const wardSel = document.getElementById('reg-ward');
+    distSel.innerHTML = '<option value="">-- Chagua Wilaya --</option>';
+    wardSel.innerHTML = '<option value="">-- Chagua Kata --</option>';
+    if (!region) return;
+    Object.keys(tanzaniaData[region]).sort().forEach(d => {
+        distSel.insertAdjacentHTML('beforeend', `<option value="${d}">${d}</option>`);
+    });
+}
+
+function populateWards() {
+    const region = document.getElementById('reg-region').value;
+    const district = document.getElementById('reg-district').value;
+    const wardSel = document.getElementById('reg-ward');
+    wardSel.innerHTML = '<option value="">-- Chagua Kata --</option>';
+    if (!region || !district) return;
+    const wards = tanzaniaData[region]?.[district] || [];
+    wards.sort().forEach(w => {
+        wardSel.insertAdjacentHTML('beforeend', `<option value="${w}">${w}</option>`);
+    });
+}
+
+// ─────────────────────────────────────────────
+//  GPS DETECTION
+// ─────────────────────────────────────────────
+function detectGPS(prefix) {
+    const statusEl = document.getElementById(`${prefix}-gps-status`);
+    statusEl.innerHTML = '<span class="spinner"></span> Inagundua mahali pako...';
+    if (!navigator.geolocation) {
+        statusEl.textContent = '❌ GPS haipo katika kivinjari hiki.';
+        return;
+    }
+    navigator.geolocation.getCurrentPosition(pos => {
+        const lat = pos.coords.latitude.toFixed(6);
+        const lng = pos.coords.longitude.toFixed(6);
+        document.getElementById(`${prefix}-lat`).value = lat;
+        document.getElementById(`${prefix}-lng`).value = lng;
+        userLat = parseFloat(lat);
+        userLng = parseFloat(lng);
+        statusEl.textContent = `✅ GPS imegunduliwa: ${lat}, ${lng}`;
+    }, err => {
+        statusEl.textContent = '⚠️ Imeshindwa kupata GPS. Wezesha ruhusa ya eneo.';
+    }, { enableHighAccuracy: true, timeout: 10000 });
+}
+
+// ─────────────────────────────────────────────
+//  TABS
+// ─────────────────────────────────────────────
+function switchTab(name) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById(`tab-${name}`).classList.add('active');
+    document.querySelectorAll('.panel').forEach(p => p.style.display = 'none');
+    if (name === 'map') {
+        document.getElementById('panel-map').style.display = 'block';
+        if (!map && jwtToken) initMap();
+    } else {
+        document.getElementById(`panel-${name}`).style.display = 'block';
+    }
+}
+
+// ─────────────────────────────────────────────
+//  REGISTER
+// ─────────────────────────────────────────────
+function register() {
+    const body = {
+        name:     document.getElementById('reg-name').value,
+        phone:    document.getElementById('reg-phone').value,
+        email:    document.getElementById('reg-email').value,
+        password: document.getElementById('reg-password').value,
+        role:     document.getElementById('reg-role').value,
+        region:   document.getElementById('reg-region').value,
+        district: document.getElementById('reg-district').value,
+        ward:     document.getElementById('reg-ward').value,
+        locationLat: parseFloat(document.getElementById('reg-lat').value) || null,
+        locationLng: parseFloat(document.getElementById('reg-lng').value) || null,
+    };
+    const statusEl = document.getElementById('reg-status');
+    statusEl.innerHTML = '<span class="spinner"></span> Inasajili...';
+
+    fetch('/api/auth/register', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
+    })
+    .then(r => { if (!r.ok) return r.text().then(t => { throw new Error(t); }); return r.json(); })
+    .then(data => {
+        statusEl.innerHTML = `<div class="alert alert-success">✅ Umesajiliwa! Ingia sasa.</div>`;
+        setTimeout(() => switchTab('login'), 1500);
+    })
+    .catch(err => {
+        statusEl.innerHTML = `<div class="alert alert-error">❌ ${err.message}</div>`;
+    });
+}
+
+// ─────────────────────────────────────────────
+//  LOGIN
+// ─────────────────────────────────────────────
+function login() {
+    const phone = document.getElementById('login-phone').value;
+    const password = document.getElementById('login-password').value;
+    const statusEl = document.getElementById('login-status');
+    statusEl.innerHTML = '<span class="spinner"></span> Inaingia...';
+
+    fetch('/api/auth/login', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone, password })
+    })
+    .then(r => { if (!r.ok) throw new Error('Nambari au nenosiri si sahihi.'); return r.json(); })
+    .then(data => {
+        jwtToken = data.token;
+        currentUser = data;
+        statusEl.innerHTML = `<div class="alert alert-success">✅ Karibu, ${data.name}!</div>`;
+
+        document.getElementById('user-badge').textContent = `👤 ${data.name} (${data.role})`;
+        document.getElementById('user-badge').style.display = 'inline';
+        document.getElementById('logout-btn').style.display = 'inline';
+
+        // Auto-detect GPS and push to backend
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(pos => {
+                userLat = pos.coords.latitude;
+                userLng = pos.coords.longitude;
+
+                // Push live GPS to backend
+                fetch('/api/users/me/location', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + jwtToken },
+                    body: JSON.stringify({ locationLat: userLat, locationLng: userLng })
+                });
+                statusEl.innerHTML += `<div class="alert alert-success">📍 GPS imejumuishwa: ${userLat.toFixed(4)}, ${userLng.toFixed(4)}</div>`;
+                initMap();
+            }, () => {
+                // Fallback to user's stored coords
+                if (data.locationLat) { userLat = data.locationLat; userLng = data.locationLng; }
+                else { userLat = -6.7924; userLng = 39.2083; } // Dar es Salaam
+                initMap();
+            }, { enableHighAccuracy: true });
+        } else {
+            userLat = data.locationLat || -6.7924;
+            userLng = data.locationLng || 39.2083;
             initMap();
-        })
-        .catch(err => {
-            document.getElementById('status').innerText = err.message;
+        }
+
+        setTimeout(() => switchTab('map'), 1500);
+    })
+    .catch(err => {
+        statusEl.innerHTML = `<div class="alert alert-error">❌ ${err.message}</div>`;
+    });
+}
+
+function logout() {
+    jwtToken = null; currentUser = null; map = null;
+    document.getElementById('user-badge').style.display = 'none';
+    document.getElementById('logout-btn').style.display = 'none';
+    document.getElementById('panel-map').innerHTML = '<div id="map-controls"></div><div id="map" style="height:calc(100vh - 120px)"></div>';
+    switchTab('login');
+}
+
+// ─────────────────────────────────────────────
+//  MAP
+// ─────────────────────────────────────────────
+function initMap() {
+    if (map) { map.remove(); map = null; }
+
+    map = L.map('map').setView([userLat || -6.7924, userLng || 39.2083], 13);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap | SkillHub Africa'
+    }).addTo(map);
+
+    // User location marker (pulsing blue)
+    const userIcon = L.divIcon({
+        html: `<div style="width:18px;height:18px;background:#38bdf8;border-radius:50%;border:3px solid white;box-shadow:0 0 0 4px rgba(56,189,248,0.3);"></div>`,
+        iconSize: [18, 18], iconAnchor: [9, 9], className: ''
+    });
+
+    userMarker = L.marker([userLat, userLng], { icon: userIcon }).addTo(map);
+    userMarker.bindPopup(`<div class="popup-title">📍 Uko Hapa!</div><div class="popup-detail">${currentUser?.name || 'Wewe'}</div><div class="popup-detail">${currentUser?.region || ''} › ${currentUser?.district || ''} › ${currentUser?.ward || ''}</div>`).openPopup();
+
+    markersLayer = L.layerGroup().addTo(map);
+}
+
+function fetchNearbyJobs() {
+    if (!jwtToken || !map) return;
+    const radius = document.getElementById('radius-select').value;
+    const statusEl = document.getElementById('map-status');
+    statusEl.innerHTML = '<span class="spinner"></span> Inatafuta kazi...';
+
+    fetch(`/api/jobs/nearby?lat=${userLat}&lng=${userLng}&radiusKm=${radius}`, {
+        headers: { 'Authorization': 'Bearer ' + jwtToken }
+    })
+    .then(r => r.json())
+    .then(jobs => {
+        markersLayer.clearLayers();
+        if (jobs.length === 0) {
+            statusEl.textContent = `⚠️ Hakuna kazi ndani ya ${radius}km.`; return;
+        }
+
+        const jobIcon = L.divIcon({
+            html: `<div style="background:#4ade80;border-radius:50%;width:14px;height:14px;border:2px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.5);"></div>`,
+            iconSize: [14, 14], iconAnchor: [7, 7], className: ''
         });
-    }
 
-    function initMap() {
-        // Initialize map centered at current location
-        map = L.map('map').setView([CURRENT_LAT, CURRENT_LNG], 12);
-
-        // Load free map tiles from OpenStreetMap
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap contributors'
-        }).addTo(map);
-
-        // Add a marker for the USER'S current location
-        L.circleMarker([CURRENT_LAT, CURRENT_LNG], { color: 'red', radius: 8 })
-            .addTo(map)
-            .bindPopup("<b>You are here!</b>").openPopup();
-
-        markersLayer = L.layerGroup().addTo(map);
-    }
-
-    function fetchNearbyJobs() {
-        if(!jwtToken) return;
-
-        // Call the backend API we just created!
-        fetch(`/api/jobs/nearby?lat=${CURRENT_LAT}&lng=${CURRENT_LNG}&radiusKm=20`, {
-            headers: { 'Authorization': 'Bearer ' + jwtToken }
-        })
-        .then(response => response.json())
-        .then(jobs => {
-            markersLayer.clearLayers();
-            
-            if(jobs.length === 0) {
-                alert("No jobs found within 20km! Try adding a job via Postman first.");
-                return;
-            }
-
-            jobs.forEach(item => {
-                const job = item.job;
-                const distance = item.distanceInKm.toFixed(2);
-                
-                // Plot each job on the map
-                const marker = L.marker([job.locationLat, job.locationLng]).addTo(markersLayer);
-                
-                // Content shown when clicking a job pin
-                marker.bindPopup(`
-                    <h3 style="margin-bottom: 5px;">${job.title}</h3>
-                    <b>Distance:</b> ${distance} km away<br>
-                    <b>Payment:</b> ${job.paymentAmount} TZS<br>
-                    <b>Status:</b> ${job.status}<br>
-                    <i>${job.description}</i>
+        jobs.forEach(item => {
+            const job = item.job;
+            const dist = item.distanceInKm.toFixed(1);
+            L.marker([job.locationLat, job.locationLng], { icon: jobIcon })
+                .addTo(markersLayer)
+                .bindPopup(`
+                    <div class="popup-title">💼 ${job.title}</div>
+                    <div class="popup-detail">📍 ${job.location || 'Haijabainishwa'}</div>
+                    <div class="popup-detail">💰 Tsh ${Number(job.paymentAmount || 0).toLocaleString()}</div>
+                    <div class="popup-detail">⏱️ ${job.duration || 'Haijabainishwa'}</div>
+                    <div class="popup-detail">🏃 ${dist} km kutoka kwako</div>
+                    <span class="popup-tag">${job.status}</span>
                 `);
-            });
-            
-            alert(`Successfully loaded ${jobs.length} jobs on the map!`);
-        })
-        .catch(err => alert("Error fetching jobs: " + err));
-    }
-</script>
+        });
 
+        statusEl.textContent = `✅ Kazi ${jobs.length} zimepatikana ndani ya ${radius}km`;
+    })
+    .catch(() => { statusEl.textContent = '❌ Imeshindwa kupata kazi.'; });
+}
+
+// ─────────────────────────────────────────────
+//  INIT
+// ─────────────────────────────────────────────
+initDropdowns();
+</script>
 </body>
 </html>
