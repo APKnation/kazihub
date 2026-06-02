@@ -1,24 +1,61 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import { Navbar } from './components/layout/Navbar';
 import { LandingPage } from './pages/LandingPage';
 import { Login } from './pages/Auth/Login';
 import { Register } from './pages/Auth/Register';
+import { JobSeekerDashboard } from './pages/JobSeeker/Dashboard';
+import { EmployerDashboard } from './pages/Employer/Dashboard';
+import { Loader2 } from 'lucide-react';
+
+// Protected route: redirects to /login if not authenticated
+function ProtectedRoute({ children, allowedRoles }) {
+  const { user, loading } = useAuth();
+  if (loading) return (
+    <div className="min-h-screen flex items-center justify-center">
+      <Loader2 className="w-8 h-8 animate-spin text-primary" />
+    </div>
+  );
+  if (!user) return <Navigate to="/login" replace />;
+  if (allowedRoles && !allowedRoles.includes(user.role)) return <Navigate to="/" replace />;
+  return children;
+}
+
+// Decides whether to show top Navbar (hide it on dashboard pages)
+function Layout() {
+  const { user } = useAuth();
+  const isDashboard = user && (user.role === 'JOB_SEEKER' || user.role === 'EMPLOYER' || user.role === 'ADMIN');
+  return (
+    <div className="min-h-screen bg-background text-foreground flex flex-col selection:bg-primary/30">
+      {!isDashboard && <Navbar />}
+      <div className="flex-1">
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/dashboard/job-seeker" element={
+            <ProtectedRoute allowedRoles={['JOB_SEEKER']}>
+              <JobSeekerDashboard />
+            </ProtectedRoute>
+          } />
+          <Route path="/dashboard/employer" element={
+            <ProtectedRoute allowedRoles={['EMPLOYER']}>
+              <EmployerDashboard />
+            </ProtectedRoute>
+          } />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </div>
+    </div>
+  );
+}
 
 function App() {
   return (
     <Router>
-      <div className="min-h-screen bg-background text-foreground flex flex-col selection:bg-primary/30">
-        <Navbar />
-        <div className="flex-1">
-          <Routes>
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/jobs" element={<div className="pt-32 text-center text-2xl font-semibold">Jobs Page Coming Soon</div>} />
-            <Route path="/employers" element={<div className="pt-32 text-center text-2xl font-semibold">Employers Page Coming Soon</div>} />
-          </Routes>
-        </div>
-      </div>
+      <AuthProvider>
+        <Layout />
+      </AuthProvider>
     </Router>
   );
 }
