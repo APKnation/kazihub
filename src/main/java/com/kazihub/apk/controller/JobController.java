@@ -69,4 +69,14 @@ public class JobController {
     public ResponseEntity<List<JobApplication>> getApplicationsByApplicant(@PathVariable Long applicantId) {
         return ResponseEntity.ok(jobService.getApplicationsByApplicant(applicantId));
     }
+
+    @GetMapping("/posted")
+    public ResponseEntity<List<Job>> getPostedJobs() {
+        return ResponseEntity.ok(jobService.getPostedJobs());
+    }
+
+    @GetMapping("/my-applications")
+    public ResponseEntity<List<JobApplication>> getMyApplications() {
+        return ResponseEntity.ok(jobService.getMyApplications());
+    }
 }
