@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '../../components/ui/Button';
 import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
 import { useAuth } from '../../context/AuthContext';
-import { AlertCircle, Loader2 } from 'lucide-react';
+import { AlertCircle, Loader2, UserCircle } from 'lucide-react';
 
 export function Login() {
   const [phone, setPhone] = useState('');
