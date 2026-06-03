@@ -5,6 +5,7 @@ import { useAuth } from '../../context/AuthContext';
 import { jobsAPI } from '../../services/api';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
+import { CardSkeleton, StatSkeleton } from '../../components/ui/Skeleton';
 import {
   Briefcase, Plus, Users, CheckCircle, XCircle, Clock, Loader2, LogOut, User, X
 } from 'lucide-react';
@@ -108,12 +109,23 @@ export function EmployerDashboard() {
         {/* Stats */}
         <div className="grid grid-cols-3 gap-4 mb-8">
           {[
-            { label: 'Jobs Posted', value: jobs.length, color: 'text-primary' },
-            { label: 'Total Applicants', value: totalApplications, color: 'text-accent' },
-            { label: 'Active Jobs', value: jobs.filter(j => j.status === 'OPEN').length, color: 'text-yellow-400' },
+            { label: 'Jobs Posted', value: jobs.length, color: 'text-primary', bg: 'bg-primary/20', icon: Briefcase },
+            { label: 'Total Applicants', value: totalApplications, color: 'text-accent', bg: 'bg-accent/20', icon: Users },
+            { label: 'Active Jobs', value: jobs.filter(j => j.status === 'OPEN').length, color: 'text-yellow-400', bg: 'bg-yellow-500/20', icon: CheckCircle },
           ].map((s, i) => (
-            <motion.div key={i} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}>
-              <Card glass className="p-5">
+            <motion.div 
+              key={i} 
+              initial={{ opacity: 0, y: 16 }} 
+              animate={{ opacity: 1, y: 0 }} 
+              transition={{ delay: i * 0.1 }}
+              whileHover={{ y: -4, scale: 1.02 }}
+            >
+              <Card glass className="p-5 hover:shadow-xl hover:shadow-primary/10 transition-all duration-300">
+                <div className="flex items-center justify-between mb-2">
+                  <div className={`w-10 h-10 ${s.bg} rounded-xl flex items-center justify-center`}>
+                    <s.icon className={`w-5 h-5 ${s.color}`} />
+                  </div>
+                </div>
                 <div className={`text-3xl font-bold mb-1 ${s.color}`}>{s.value}</div>
                 <div className="text-sm text-foreground/60">{s.label}</div>
               </Card>
@@ -134,31 +146,41 @@ export function EmployerDashboard() {
         {error && <div className="text-red-400 text-sm mb-4 p-3 bg-red-500/10 rounded-lg border border-red-500/20">{error}</div>}
 
         {loading ? (
-          <div className="flex justify-center py-20"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <CardSkeleton key={i} />
+            ))}
+          </div>
         ) : activeTab === 'jobs' ? (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {jobs.length === 0 ? (
               <div className="col-span-3 text-center py-16">
-                <Briefcase className="w-12 h-12 text-foreground/20 mx-auto mb-4" />
+                <Briefcase className="w-16 h-16 text-foreground/20 mx-auto mb-4" />
                 <p className="text-foreground/50">No jobs posted yet. Click "Post a Job" to get started.</p>
               </div>
             ) : jobs.map((job, i) => (
-              <motion.div key={job.id} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
-                <Card glass className="h-full flex flex-col hover:border-primary/50 transition-colors">
+              <motion.div 
+                key={job.id} 
+                initial={{ opacity: 0, y: 16 }} 
+                animate={{ opacity: 1, y: 0 }} 
+                transition={{ delay: i * 0.05 }}
+                whileHover={{ y: -8 }}
+              >
+                <Card glass className="h-full flex flex-col hover:border-primary/50 hover:shadow-xl hover:shadow-primary/10 transition-all duration-300">
                   <CardHeader>
                     <div className="flex items-start justify-between">
                       <CardTitle className="text-lg">{job.title}</CardTitle>
-                      <span className={`text-xs px-2 py-1 rounded-full font-medium ${job.status === 'OPEN' ? 'bg-accent/20 text-accent' : 'bg-border text-foreground/50'}`}>
+                      <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${job.status === 'OPEN' ? 'bg-accent/20 text-accent' : 'bg-border text-foreground/50'}`}>
                         {job.status}
                       </span>
                     </div>
                   </CardHeader>
                   <CardContent className="flex-1 flex flex-col gap-3">
-                    <p className="text-foreground/60 text-sm line-clamp-2">{job.description}</p>
+                    <p className="text-foreground/60 text-sm line-clamp-2 leading-relaxed">{job.description}</p>
                     <div className="flex items-center gap-1 text-foreground/50 text-xs">
                       <Users className="w-3 h-3" /> {job.applicationCount || 0} applicants
                     </div>
-                    <Button variant="secondary" size="sm" className="mt-auto w-full gap-2" onClick={() => viewApplications(job.id)}>
+                    <Button variant="secondary" size="sm" className="mt-auto w-full gap-2 shadow-lg" onClick={() => viewApplications(job.id)}>
                       <Users className="w-4 h-4" /> View Applicants
                     </Button>
                   </CardContent>
@@ -177,10 +199,19 @@ export function EmployerDashboard() {
                 </div>
                 <div className="grid gap-3">
                   {applications.length === 0 ? (
-                    <p className="text-foreground/50 text-center py-16">No applications for this job yet.</p>
+                    <div className="text-center py-16">
+                      <Users className="w-16 h-16 text-foreground/20 mx-auto mb-4" />
+                      <p className="text-foreground/50">No applications for this job yet.</p>
+                    </div>
                   ) : applications.map((app, i) => (
-                    <motion.div key={app.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
-                      <Card glass>
+                    <motion.div 
+                      key={app.id} 
+                      initial={{ opacity: 0, y: 8 }} 
+                      animate={{ opacity: 1, y: 0 }} 
+                      transition={{ delay: i * 0.05 }}
+                      whileHover={{ x: 4 }}
+                    >
+                      <Card glass className="hover:border-primary/30 hover:shadow-lg transition-all duration-300">
                         <CardContent className="p-4 flex items-center justify-between">
                           <div>
                             <p className="font-semibold">{app.applicantName}</p>
@@ -192,7 +223,7 @@ export function EmployerDashboard() {
                             </span>
                             {app.status === 'PENDING' && (
                               <>
-                                <Button variant="accent" size="sm" className="gap-1" onClick={() => handleStatusChange(app.id, 'ACCEPTED')}>
+                                <Button variant="accent" size="sm" className="gap-1 shadow-lg shadow-accent/20" onClick={() => handleStatusChange(app.id, 'ACCEPTED')}>
                                   <CheckCircle className="w-3 h-3" /> Accept
                                 </Button>
                                 <Button variant="secondary" size="sm" className="gap-1 text-red-400 border-red-500/30 hover:bg-red-500/10" onClick={() => handleStatusChange(app.id, 'REJECTED')}>

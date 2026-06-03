@@ -5,6 +5,7 @@ import { useAuth } from '../../context/AuthContext';
 import { jobsAPI } from '../../services/api';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
+import { CardSkeleton, StatSkeleton } from '../../components/ui/Skeleton';
 import { Briefcase, MapPin, Clock, CheckCircle, XCircle, Loader2, LogOut, User } from 'lucide-react';
 
 const statusIcon = { PENDING: Clock, ACCEPTED: CheckCircle, REJECTED: XCircle };
@@ -81,12 +82,23 @@ export function JobSeekerDashboard() {
         {/* Stats row */}
         <div className="grid grid-cols-3 gap-4 mb-8">
           {[
-            { label: 'Available Jobs', value: jobs.length, color: 'bg-primary/20 text-primary' },
-            { label: 'Applications Sent', value: applications.length, color: 'bg-accent/20 text-accent' },
-            { label: 'Pending', value: applications.filter(a => a.status === 'PENDING').length, color: 'bg-yellow-500/20 text-yellow-400' },
+            { label: 'Available Jobs', value: jobs.length, color: 'bg-primary/20 text-primary', icon: Briefcase },
+            { label: 'Applications Sent', value: applications.length, color: 'bg-accent/20 text-accent', icon: CheckCircle },
+            { label: 'Pending', value: applications.filter(a => a.status === 'PENDING').length, color: 'bg-yellow-500/20 text-yellow-400', icon: Clock },
           ].map((stat, i) => (
-            <motion.div key={i} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}>
-              <Card glass className="p-5">
+            <motion.div 
+              key={i} 
+              initial={{ opacity: 0, y: 16 }} 
+              animate={{ opacity: 1, y: 0 }} 
+              transition={{ delay: i * 0.1 }}
+              whileHover={{ y: -4, scale: 1.02 }}
+            >
+              <Card glass className="p-5 hover:shadow-xl hover:shadow-primary/10 transition-all duration-300">
+                <div className="flex items-center justify-between mb-2">
+                  <div className={`w-10 h-10 ${stat.color.split(' ')[0]} rounded-xl flex items-center justify-center`}>
+                    <stat.icon className={`w-5 h-5 ${stat.color.split(' ')[1]}`} />
+                  </div>
+                </div>
                 <div className={`text-3xl font-bold mb-1 ${stat.color.split(' ')[1]}`}>{stat.value}</div>
                 <div className="text-sm text-foreground/60">{stat.label}</div>
               </Card>
@@ -107,20 +119,33 @@ export function JobSeekerDashboard() {
         {error && <div className="text-red-400 text-sm mb-4 p-3 bg-red-500/10 rounded-lg border border-red-500/20">{error}</div>}
 
         {loading ? (
-          <div className="flex justify-center py-20"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <CardSkeleton key={i} />
+            ))}
+          </div>
         ) : activeTab === 'browse' ? (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {jobs.length === 0 ? (
-              <p className="col-span-3 text-center text-foreground/50 py-16">No jobs available right now.</p>
+              <div className="col-span-3 text-center py-16">
+                <Briefcase className="w-16 h-16 text-foreground/20 mx-auto mb-4" />
+                <p className="text-foreground/50">No jobs available right now.</p>
+              </div>
             ) : jobs.map((job, i) => (
-              <motion.div key={job.id} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
-                <Card glass className="h-full flex flex-col hover:border-primary/50 transition-colors">
+              <motion.div 
+                key={job.id} 
+                initial={{ opacity: 0, y: 16 }} 
+                animate={{ opacity: 1, y: 0 }} 
+                transition={{ delay: i * 0.05 }}
+                whileHover={{ y: -8 }}
+              >
+                <Card glass className="h-full flex flex-col hover:border-primary/50 hover:shadow-xl hover:shadow-primary/10 transition-all duration-300">
                   <CardHeader>
                     <CardTitle className="text-lg">{job.title}</CardTitle>
                     <p className="text-primary/80 text-sm font-medium">{job.companyName}</p>
                   </CardHeader>
                   <CardContent className="flex-1 flex flex-col gap-3">
-                    <p className="text-foreground/60 text-sm line-clamp-3">{job.description}</p>
+                    <p className="text-foreground/60 text-sm line-clamp-3 leading-relaxed">{job.description}</p>
                     <div className="flex items-center gap-1 text-foreground/50 text-xs">
                       <MapPin className="w-3 h-3" /> {job.region || 'Tanzania'}
                     </div>
@@ -130,7 +155,7 @@ export function JobSeekerDashboard() {
                     <Button
                       variant={appliedJobIds.has(job.id) ? 'secondary' : 'accent'}
                       size="sm"
-                      className="mt-auto w-full"
+                      className="mt-auto w-full shadow-lg shadow-accent/20"
                       disabled={appliedJobIds.has(job.id) || applying === job.id}
                       onClick={() => handleApply(job.id)}
                     >
@@ -145,18 +170,27 @@ export function JobSeekerDashboard() {
         ) : (
           <div className="grid gap-4 md:grid-cols-2">
             {applications.length === 0 ? (
-              <p className="col-span-2 text-center text-foreground/50 py-16">You haven't applied to any jobs yet.</p>
+              <div className="col-span-2 text-center py-16">
+                <Briefcase className="w-16 h-16 text-foreground/20 mx-auto mb-4" />
+                <p className="text-foreground/50">You haven't applied to any jobs yet.</p>
+              </div>
             ) : applications.map((app, i) => {
               const Icon = statusIcon[app.status] || Clock;
               return (
-                <motion.div key={app.id} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
-                  <Card glass className="hover:border-primary/30 transition-colors">
+                <motion.div 
+                  key={app.id} 
+                  initial={{ opacity: 0, y: 16 }} 
+                  animate={{ opacity: 1, y: 0 }} 
+                  transition={{ delay: i * 0.05 }}
+                  whileHover={{ x: 4 }}
+                >
+                  <Card glass className="hover:border-primary/30 hover:shadow-lg transition-all duration-300">
                     <CardContent className="p-5 flex items-center justify-between">
                       <div>
                         <p className="font-semibold text-foreground">{app.jobTitle}</p>
                         <p className="text-sm text-foreground/60">{app.companyName}</p>
                       </div>
-                      <div className={`flex items-center gap-1.5 text-sm font-medium ${statusColor[app.status]}`}>
+                      <div className={`flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-full ${statusBg[app.status]} ${statusColor[app.status]}`}>
                         <Icon className="w-4 h-4" />
                         {app.status}
                       </div>

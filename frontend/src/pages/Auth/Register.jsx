@@ -32,11 +32,12 @@ export function Register() {
     }
   };
 
-  const inputClass = "w-full h-11 bg-background/50 border border-border rounded-lg px-4 text-foreground focus:outline-none focus:border-primary transition-colors";
+  const inputClass = "w-full h-12 bg-background/60 border border-border/60 rounded-xl px-4 text-foreground focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all";
 
   return (
     <div className="min-h-screen pt-20 flex items-center justify-center px-4 relative overflow-hidden">
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-accent/10 rounded-full blur-[100px] -z-10" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-accent/15 rounded-full blur-[120px] -z-10 animate-pulse" />
+      <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-primary/15 rounded-full blur-[100px] -z-10" />
 
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
@@ -44,20 +45,23 @@ export function Register() {
         transition={{ duration: 0.4 }}
         className="w-full max-w-lg"
       >
-        <Card glass>
-          <CardHeader className="text-center pt-8">
+        <Card glass className="shadow-2xl shadow-accent/10">
+          <CardHeader className="text-center pt-8 pb-4">
+            <div className="w-16 h-16 bg-gradient-to-br from-accent/30 to-accent/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <UserCircle className="w-8 h-8 text-accent" />
+            </div>
             <CardTitle className="text-3xl font-bold">Create Account</CardTitle>
             <p className="text-foreground/60 mt-2">Join SkillHub Africa today</p>
           </CardHeader>
           <CardContent className="pb-8">
             {/* Role Switcher */}
-            <div className="flex gap-2 mb-6 p-1 bg-background/50 rounded-lg border border-border">
+            <div className="flex gap-2 mb-6 p-1.5 bg-background/60 rounded-xl border border-border/60">
               {['JOB_SEEKER', 'EMPLOYER'].map((r) => (
                 <button
                   key={r}
                   type="button"
                   onClick={() => setRole(r)}
-                  className={`flex-1 py-2 text-sm font-medium rounded-md transition-all ${role === r ? 'bg-primary text-white shadow-md' : 'text-foreground/70 hover:text-foreground'}`}
+                  className={`flex-1 py-2.5 text-sm font-medium rounded-lg transition-all ${role === r ? 'bg-primary text-white shadow-md' : 'text-foreground/70 hover:text-foreground hover:bg-card/50'}`}
                 >
                   {r === 'JOB_SEEKER' ? 'Job Seeker' : 'Employer'}
                 </button>
@@ -77,37 +81,37 @@ export function Register() {
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
-                <div className="col-span-2 space-y-1">
+                <div className="col-span-2 space-y-2">
                   <label className="text-sm font-medium text-foreground/80">Full Name</label>
                   <input name="name" type="text" value={form.name} onChange={handleChange} className={inputClass} placeholder="John Doe" required />
                 </div>
-                <div className="space-y-1">
+                <div className="space-y-2">
                   <label className="text-sm font-medium text-foreground/80">Phone</label>
                   <input name="phone" type="text" value={form.phone} onChange={handleChange} className={inputClass} placeholder="+255 700 000 000" required />
                 </div>
-                <div className="space-y-1">
+                <div className="space-y-2">
                   <label className="text-sm font-medium text-foreground/80">Email (optional)</label>
                   <input name="email" type="email" value={form.email} onChange={handleChange} className={inputClass} placeholder="you@email.com" />
                 </div>
-                <div className="col-span-2 space-y-1">
+                <div className="col-span-2 space-y-2">
                   <label className="text-sm font-medium text-foreground/80">Password</label>
                   <input name="password" type="password" value={form.password} onChange={handleChange} className={inputClass} placeholder="••••••••" required />
                 </div>
-                <div className="space-y-1">
+                <div className="space-y-2">
                   <label className="text-sm font-medium text-foreground/80">Region</label>
                   <input name="region" type="text" value={form.region} onChange={handleChange} className={inputClass} placeholder="Dar es Salaam" />
                 </div>
-                <div className="space-y-1">
+                <div className="space-y-2">
                   <label className="text-sm font-medium text-foreground/80">District</label>
                   <input name="district" type="text" value={form.district} onChange={handleChange} className={inputClass} placeholder="Ilala" />
                 </div>
-                <div className="col-span-2 space-y-1">
+                <div className="col-span-2 space-y-2">
                   <label className="text-sm font-medium text-foreground/80">Ward</label>
                   <input name="ward" type="text" value={form.ward} onChange={handleChange} className={inputClass} placeholder="Gerezani" />
                 </div>
               </div>
 
-              <Button type="submit" variant="primary" className="w-full mt-2" disabled={loading}>
+              <Button type="submit" variant="primary" className="w-full mt-2 h-12 shadow-lg shadow-primary/20" disabled={loading}>
                 {loading ? (
                   <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Creating account...</>
                 ) : `Sign Up as ${role === 'JOB_SEEKER' ? 'Talent' : 'Employer'}`}
@@ -116,7 +120,7 @@ export function Register() {
 
             <div className="mt-6 text-center text-sm text-foreground/60">
               Already have an account?{' '}
-              <Link to="/login" className="text-primary hover:underline font-medium">Log in</Link>
+              <Link to="/login" className="text-primary hover:underline font-medium transition-colors">Log in</Link>
             </div>
           </CardContent>
         </Card>
