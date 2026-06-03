@@ -3,9 +3,12 @@ package com.kazihub.apk.service;
 import com.kazihub.apk.model.Job;
 import com.kazihub.apk.model.JobApplication;
 import com.kazihub.apk.model.JobStatus;
+import com.kazihub.apk.model.User;
 import com.kazihub.apk.repository.JobApplicationRepository;
 import com.kazihub.apk.repository.JobRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -64,5 +67,17 @@ public class JobService {
 
     public List<JobApplication> getApplicationsByApplicant(Long applicantId) {
         return jobApplicationRepository.findByApplicantId(applicantId);
+    }
+
+    public List<Job> getPostedJobs() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User currentUser = (User) authentication.getPrincipal();
+        return jobRepository.findByEmployerId(currentUser.getId());
+    }
+
+    public List<JobApplication> getMyApplications() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User currentUser = (User) authentication.getPrincipal();
+        return jobApplicationRepository.findByApplicantId(currentUser.getId());
     }
 }
