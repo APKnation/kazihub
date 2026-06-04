@@ -27,7 +27,6 @@ import java.util.List;
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
 
@@ -42,13 +41,14 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
                     "/api/auth/**",
+                    "/api/jobs/**",
                     "/swagger-ui/**",
                     "/v3/api-docs/**",
                     "/swagger-ui.html",
-                    "/map.html",          // Visual map testing page
-                    "/static/**",         // All static assets
-                    "/uploads/**",        // All uploaded files (avatars, etc.)
-                    "/*.html",            // All HTML files in root
+                    "/map.html",
+                    "/static/**",
+                    "/uploads/**",
+                    "/*.html",
                     "/*.css",
                     "/*.js"
                 ).permitAll()
@@ -56,8 +56,7 @@ public class SecurityConfig {
             )
             .sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            )
-            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+            );
 
         return http.build();
     }

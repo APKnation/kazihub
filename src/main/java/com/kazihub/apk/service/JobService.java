@@ -26,6 +26,11 @@ public class JobService {
     private final LocationService locationService;
 
     public Job createJob(Job job) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof User) {
+            User currentUser = (User) authentication.getPrincipal();
+            job.setEmployer(currentUser);
+        }
         return jobRepository.save(job);
     }
 
@@ -71,13 +76,19 @@ public class JobService {
 
     public List<Job> getPostedJobs() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User currentUser = (User) authentication.getPrincipal();
-        return jobRepository.findByEmployerId(currentUser.getId());
+        if (authentication != null && authentication.getPrincipal() instanceof User) {
+            User currentUser = (User) authentication.getPrincipal();
+            return jobRepository.findByEmployerId(currentUser.getId());
+        }
+        return jobRepository.findAll();
     }
 
     public List<JobApplication> getMyApplications() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User currentUser = (User) authentication.getPrincipal();
-        return jobApplicationRepository.findByApplicantId(currentUser.getId());
+        if (authentication != null && authentication.getPrincipal() instanceof User) {
+            User currentUser = (User) authentication.getPrincipal();
+            return jobApplicationRepository.findByApplicantId(currentUser.getId());
+        }
+        return jobApplicationRepository.findAll();
     }
 }

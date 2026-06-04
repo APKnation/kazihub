@@ -17,7 +17,7 @@ public class DataSeeder implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        if (!userRepository.existsByPhone("admin@kazihub.com")) {
+        if (!userRepository.existsByPhone("admin@kazihub.com") && !userRepository.existsByEmail("admin@kazihub.com")) {
             User admin = User.builder()
                     .name("Super Admin")
                     .phone("admin@kazihub.com") // using email as phone placeholder for admin
