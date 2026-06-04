@@ -24,7 +24,8 @@ function ProtectedRoute({ children, allowedRoles }) {
 // Decides whether to show top Navbar (hide it on dashboard pages)
 function Layout() {
   const { user } = useAuth();
-  const isDashboard = user && (user.role === 'JOB_SEEKER' || user.role === 'EMPLOYER' || user.role === 'ADMIN');
+  const location = window.location.pathname;
+  const isDashboard = location.startsWith('/dashboard');
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col selection:bg-primary/30">
       {!isDashboard && <Navbar />}
