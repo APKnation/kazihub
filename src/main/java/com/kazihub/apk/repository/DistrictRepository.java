@@ -8,6 +8,6 @@ import java.util.List;
 
 @Repository
 public interface DistrictRepository extends JpaRepository<District, Long> {
-    List<District> findByRegionIdOrderBy_nameAsc(Long regionId);
-    List<District> findByRegionNameOrderBy_nameAsc(String regionName);
+    List<District> findByRegionIdOrderByNameAsc(Long regionId);
+    List<District> findByRegionNameOrderByNameAsc(String regionName);
 }

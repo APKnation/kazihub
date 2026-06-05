@@ -8,6 +8,6 @@ import java.util.List;
 
 @Repository
 public interface WardRepository extends JpaRepository<Ward, Long> {
-    List<Ward> findByDistrictIdOrderBy_nameAsc(Long districtId);
-    List<Ward> findByDistrictNameOrderBy_nameAsc(String districtName);
+    List<Ward> findByDistrictIdOrderByNameAsc(Long districtId);
+    List<Ward> findByDistrictNameOrderByNameAsc(String districtName);
 }
