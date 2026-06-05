@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '../../components/ui/Button';
 import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
 import { useAuth } from '../../context/AuthContext';
-import { AlertCircle, Loader2, UserCircle } from 'lucide-react';
+import { locationAPI } from '../../services/api';
+import { AlertCircle, Loader2, UserCircle, ChevronDown } from 'lucide-react';
 
 export function Register() {
   const [role, setRole] = useState('JOB_SEEKER');
@@ -14,7 +15,99 @@ export function Register() {
   const { register } = useAuth();
   const navigate = useNavigate();
 
+  // Location data
+  const [regions, setRegions] = useState([]);
+  const [districts, setDistricts] = useState([]);
+  const [wards, setWards] = useState([]);
+  const [selectedRegion, setSelectedRegion] = useState('');
+  const [selectedDistrict, setSelectedDistrict] = useState('');
+  const [loadingLocations, setLoadingLocations] = useState(false);
+
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+
+  // Load regions on mount
+  useEffect(() => {
+    const loadRegions = async () => {
+      try {
+        setLoadingLocations(true);
+        const response = await locationAPI.getRegions();
+        setRegions(response.data);
+      } catch (err) {
+        console.error('Failed to load regions:', err);
+      } finally {
+        setLoadingLocations(false);
+      }
+    };
+    loadRegions();
+  }, []);
+
+  // Load districts when region changes
+  useEffect(() => {
+    const loadDistricts = async () => {
+      if (!selectedRegion) {
+        setDistricts([]);
+        setWards([]);
+        setSelectedDistrict('');
+        setForm(prev => ({ ...prev, district: '', ward: '' }));
+        return;
+      }
+      try {
+        setLoadingLocations(true);
+        const response = await locationAPI.getDistricts(selectedRegion);
+        setDistricts(response.data);
+        setWards([]);
+        setSelectedDistrict('');
+        setForm(prev => ({ ...prev, district: '', ward: '' }));
+      } catch (err) {
+        console.error('Failed to load districts:', err);
+      } finally {
+        setLoadingLocations(false);
+      }
+    };
+    loadDistricts();
+  }, [selectedRegion]);
+
+  // Load wards when district changes
+  useEffect(() => {
+    const loadWards = async () => {
+      if (!selectedDistrict) {
+        setWards([]);
+        setForm(prev => ({ ...prev, ward: '' }));
+        return;
+      }
+      try {
+        setLoadingLocations(true);
+        const response = await locationAPI.getWards(selectedDistrict);
+        setWards(response.data);
+        setForm(prev => ({ ...prev, ward: '' }));
+      } catch (err) {
+        console.error('Failed to load wards:', err);
+      } finally {
+        setLoadingLocations(false);
+      }
+    };
+    loadWards();
+  }, [selectedDistrict]);
+
+  const handleRegionChange = (e) => {
+    const regionId = e.target.value;
+    setSelectedRegion(regionId);
+    const selectedRegionData = regions.find(r => r.id === parseInt(regionId));
+    setForm(prev => ({ ...prev, region: selectedRegionData?.name || '' }));
+  };
+
+  const handleDistrictChange = (e) => {
+    const districtId = e.target.value;
+    setSelectedDistrict(districtId);
+    const selectedDistrictData = districts.find(d => d.id === parseInt(districtId));
+    setForm(prev => ({ ...prev, district: selectedDistrictData?.name || '' }));
+  };
+
+  const handleWardChange = (e) => {
+    const wardId = e.target.value;
+    const selectedWardData = wards.find(w => w.id === parseInt(wardId));
+    setForm(prev => ({ ...prev, ward: selectedWardData?.name || '' }));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -99,15 +192,65 @@ export function Register() {
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-foreground/80">Region</label>
-                  <input name="region" type="text" value={form.region} onChange={handleChange} className={inputClass} placeholder="Dar es Salaam" />
+                  <div className="relative">
+                    <select
+                      name="region"
+                      value={selectedRegion}
+                      onChange={handleRegionChange}
+                      className={`${inputClass} appearance-none cursor-pointer`}
+                      required
+                    >
+                      <option value="">Select Region</option>
+                      {regions.map((region) => (
+                        <option key={region.id} value={region.id}>
+                          {region.name}
+                        </option>
+                      ))}
+                    </select>
+                    <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/50 pointer-events-none" />
+                  </div>
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-foreground/80">District</label>
-                  <input name="district" type="text" value={form.district} onChange={handleChange} className={inputClass} placeholder="Ilala" />
+                  <div className="relative">
+                    <select
+                      name="district"
+                      value={selectedDistrict}
+                      onChange={handleDistrictChange}
+                      className={`${inputClass} appearance-none cursor-pointer ${!selectedRegion ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      disabled={!selectedRegion}
+                      required
+                    >
+                      <option value="">Select District</option>
+                      {districts.map((district) => (
+                        <option key={district.id} value={district.id}>
+                          {district.name}
+                        </option>
+                      ))}
+                    </select>
+                    <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/50 pointer-events-none" />
+                  </div>
                 </div>
                 <div className="col-span-2 space-y-2">
                   <label className="text-sm font-medium text-foreground/80">Ward</label>
-                  <input name="ward" type="text" value={form.ward} onChange={handleChange} className={inputClass} placeholder="Gerezani" />
+                  <div className="relative">
+                    <select
+                      name="ward"
+                      value={form.ward}
+                      onChange={handleWardChange}
+                      className={`${inputClass} appearance-none cursor-pointer ${!selectedDistrict ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      disabled={!selectedDistrict}
+                      required
+                    >
+                      <option value="">Select Ward</option>
+                      {wards.map((ward) => (
+                        <option key={ward.id} value={ward.id}>
+                          {ward.name}
+                        </option>
+                      ))}
+                    </select>
+                    <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/50 pointer-events-none" />
+                  </div>
                 </div>
               </div>
 

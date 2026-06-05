@@ -61,4 +61,11 @@ export const skillsAPI = {
   removeFromProfile: (skillId) => api.delete(`/skills/${skillId}/remove`),
 };
 
+// ── Locations ─────────────────────────────────────────
+export const locationAPI = {
+  getRegions: () => api.get('/locations/regions'),
+  getDistricts: (regionId) => api.get('/locations/districts', { params: { regionId } }),
+  getWards: (districtId) => api.get('/locations/wards', { params: { districtId } }),
+};
+
 export default api;
