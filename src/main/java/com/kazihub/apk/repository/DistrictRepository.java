@@ -4,10 +4,13 @@ import com.kazihub.apk.model.District;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.List;
 
 @Repository
 public interface DistrictRepository extends JpaRepository<District, Long> {
     List<District> findByRegionIdOrderByNameAsc(Long regionId);
     List<District> findByRegionNameOrderByNameAsc(String regionName);
+
+    Collection<Object> findByRegionIdOrderBy_nameAsc(Long regionId);
 }
