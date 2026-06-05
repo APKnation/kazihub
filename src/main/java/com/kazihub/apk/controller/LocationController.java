@@ -36,7 +36,7 @@ public class LocationController {
 
     @GetMapping("/districts")
     public List<DistrictDto> getDistrictsByRegion(@RequestParam Long regionId) {
-        return districtRepository.findByRegionIdOrderBy_nameAsc(regionId).stream()
+        return districtRepository.findByRegionIdOrderByNameAsc(regionId).stream()
                 .map(district -> DistrictDto.builder()
                         .id(district.getId())
                         .name(district.getName())
@@ -47,7 +47,7 @@ public class LocationController {
 
     @GetMapping("/wards")
     public List<WardDto> getWardsByDistrict(@RequestParam Long districtId) {
-        return wardRepository.findByDistrictIdOrderBy_nameAsc(districtId).stream()
+        return wardRepository.findByDistrictIdOrderByNameAsc(districtId).stream()
                 .map(ward -> WardDto.builder()
                         .id(ward.getId())
                         .name(ward.getName())
