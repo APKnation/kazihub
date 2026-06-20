@@ -29,9 +29,9 @@ public class DataSeeder implements CommandLineRunner {
         if (!userRepository.existsByPhone("admin@kazihub.com") && !userRepository.existsByEmail("admin@kazihub.com")) {
             User admin = User.builder()
                     .name("Super Admin")
-                    .phone("admin@kazihub.com") // using email as phone placeholder for admin
+                    .phone("0741019426") // using email as phone placeholder for admin
                     .email("admin@kazihub.com")
-                    .password(passwordEncoder.encode("admin123"))
+                    .password(passwordEncoder.encode("1234"))
                     .role(Role.ADMIN)
                     .active(true)
                     .build();

@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { ArrowRight, Star, Shield, Zap, Users, TrendingUp, Briefcase } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
 
 export function LandingPage() {
@@ -111,9 +112,11 @@ export function LandingPage() {
             Join thousands of professionals and companies already using SkillHub Africa to transform their careers and businesses.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button variant="primary" size="lg" className="gap-2">
-              Create Free Account <ArrowRight className="w-5 h-5" />
-            </Button>
+            <Link to="/register">
+              <Button variant="primary" size="lg" className="gap-2">
+                Create Free Account <ArrowRight className="w-5 h-5" />
+              </Button>
+            </Link>
             <Button variant="outline" size="lg">
               Learn More
             </Button>
