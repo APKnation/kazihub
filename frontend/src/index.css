@@ -1,17 +1,22 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
+  html {
+    font-feature-settings: "calt", "rlig";
+  }
+
   body {
-    @apply bg-background text-foreground font-sans antialiased;
+    @apply bg-canvas text-ink font-sans antialiased;
   }
 }
 
 @layer utilities {
-  .glass {
-    @apply bg-card/60 backdrop-blur-md border border-border/50;
+  .border-hairline-card {
+    @apply border border-hairline rounded-md;
   }
 }

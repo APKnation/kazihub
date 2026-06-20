@@ -7,51 +7,52 @@ export default {
   theme: {
     extend: {
       colors: {
-        background: '#0B1120',
-        foreground: '#F1F5F9',
         primary: {
-          DEFAULT: '#6366F1',
-          hover: '#4F46E5',
-          foreground: '#FFFFFF',
-          50: '#EEF2FF',
-          100: '#E0E7FF',
-          200: '#C7D2FE',
-          300: '#A5B4FC',
-          400: '#818CF8',
-          500: '#6366F1',
-          600: '#4F46E5',
-          700: '#4338CA',
-          800: '#3730A3',
-          900: '#312E81',
+          DEFAULT: '#00d992',
+          soft: '#2fd6a1',
+          deep: '#10b981',
         },
-        card: {
-          DEFAULT: '#1E293B',
-          foreground: '#F1F5F9'
+        'on-primary': '#101010',
+        canvas: {
+          DEFAULT: '#101010',
+          soft: '#1a1a1a',
+          'text-soft': '#f5f6f7',
         },
-        border: '#334155',
-        accent: {
-          DEFAULT: '#14B8A6',
-          hover: '#0D9488',
-          foreground: '#FFFFFF',
-          50: '#F0FDFA',
-          100: '#CCFBF1',
-          200: '#99F6E4',
-          300: '#5EEAD4',
-          400: '#2DD4BF',
-          500: '#14B8A6',
-          600: '#0D9488',
-          700: '#0F766E',
-          800: '#115E59',
-          900: '#134E4A',
+        ink: {
+          DEFAULT: '#f2f2f2',
+          strong: '#ffffff',
         },
-        secondary: {
-          DEFAULT: '#8B5CF6',
-          hover: '#7C3AED',
-          foreground: '#FFFFFF',
-        }
+        body: '#bdbdbd',
+        mute: '#8b949e',
+        hairline: {
+          DEFAULT: '#3d3a39',
+          soft: '#b8b3b0',
+        },
       },
       fontFamily: {
-        sans: ['Inter', 'sans-serif'],
+        sans: ['Inter', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
+        mono: ['SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'Liberation Mono', 'monospace'],
+      },
+      borderRadius: {
+        none: '0px',
+        xs: '4px',
+        sm: '6px',
+        md: '8px',
+        pill: '9999px',
+        full: '9999px',
+      },
+      spacing: {
+        xxs: '2px',
+        xs: '4px',
+        sm: '8px',
+        md: '12px',
+        lg: '16px',
+        xl: '20px',
+        '2xl': '24px',
+        '3xl': '32px',
+        '4xl': '40px',
+        '5xl': '48px',
+        '6xl': '64px',
       },
       animation: {
         'fade-in': 'fadeIn 0.5s ease-out',
@@ -69,8 +70,9 @@ export default {
         }
       },
       boxShadow: {
-        'glow': '0 0 20px rgba(99, 102, 241, 0.3)',
-        'glow-accent': '0 0 20px rgba(20, 184, 166, 0.3)',
+        'glow': '0 0 20px rgba(0, 217, 146, 0.3)', // primary green glow
+        'inset-glow': '0 0 15px rgba(92, 88, 85, 0.2)',
+        'modal': '0 20px 60px rgba(0,0,0,0.7), inset 0 0 0 1px rgba(148,163,184,0.1)',
       }
     },
   },
