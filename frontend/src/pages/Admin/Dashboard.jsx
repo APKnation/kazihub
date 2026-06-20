@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   Users, Briefcase, ShieldCheck, ShieldOff, LogOut,
-  TrendingUp, ToggleLeft, ToggleRight, Loader2, AlertCircle, Plus, X
+  TrendingUp, ToggleLeft, ToggleRight, Loader2, AlertCircle, Plus, X,
+  Pencil, Trash2, MapPin, Check
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import api from '../../services/api';
+import { jobsAPI } from '../../services/api';
 
 export function AdminDashboard() {
   const { user, logout } = useAuth();
@@ -20,8 +22,11 @@ export function AdminDashboard() {
   
   // Job posting state
   const [showJobModal, setShowJobModal] = useState(false);
-  const [newJob, setNewJob] = useState({ title: '', description: '', location: '', paymentAmount: '', duration: '' });
+  const [editingJob, setEditingJob] = useState(null);
+  const [jobForm, setJobForm] = useState({ title: '', description: '', location: '', paymentAmount: '', duration: '', status: 'OPEN' });
   const [jobPosting, setJobPosting] = useState(false);
+  const [confirmDeleteId, setConfirmDeleteId] = useState(null);
+  const [deletingId, setDeletingId] = useState(null);
 
   useEffect(() => {
     fetchData();
@@ -60,14 +65,63 @@ export function AdminDashboard() {
     setJobPosting(true);
     setError('');
     try {
-      const res = await api.post('/jobs', newJob);
-      setJobs([res.data, ...jobs]);
+      const payload = { ...jobForm, paymentAmount: jobForm.paymentAmount ? Number(jobForm.paymentAmount) : null };
+      if (editingJob) {
+        const res = await jobsAPI.update(editingJob.id, payload);
+        setJobs(prev => prev.map(j => j.id === editingJob.id ? res.data : j));
+      } else {
+        const res = await api.post('/jobs', payload);
+        setJobs([res.data, ...jobs]);
+      }
       setShowJobModal(false);
-      setNewJob({ title: '', description: '', location: '', paymentAmount: '', duration: '' });
+      setEditingJob(null);
+      setJobForm({ title: '', description: '', location: '', paymentAmount: '', duration: '', status: 'OPEN' });
     } catch (err) {
-      setError('Failed to post job.');
+      setError('Failed to save job.');
     } finally {
       setJobPosting(false);
+    }
+  };
+
+  const openCreate = () => {
+    setEditingJob(null);
+    setJobForm({ title: '', description: '', location: '', paymentAmount: '', duration: '', status: 'OPEN' });
+    setShowJobModal(true);
+  };
+
+  const openEdit = (job) => {
+    setEditingJob(job);
+    setJobForm({
+      title: job.title || '',
+      description: job.description || '',
+      location: job.location || '',
+      paymentAmount: job.paymentAmount || '',
+      duration: job.duration || '',
+      status: job.status || 'OPEN',
+    });
+    setShowJobModal(true);
+  };
+
+  const handleDeleteJob = async (id) => {
+    setDeletingId(id);
+    try {
+      await jobsAPI.delete(id);
+      setJobs(prev => prev.filter(j => j.id !== id));
+      setConfirmDeleteId(null);
+    } catch {
+      setError('Failed to delete job.');
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
+  const handleToggleStatus = async (job) => {
+    const newStatus = job.status === 'OPEN' ? 'CLOSED' : 'OPEN';
+    try {
+      const res = await jobsAPI.update(job.id, { ...job, status: newStatus });
+      setJobs(prev => prev.map(j => j.id === job.id ? res.data : j));
+    } catch {
+      setError('Failed to toggle job status.');
     }
   };
 
@@ -138,13 +192,15 @@ export function AdminDashboard() {
             <p className="text-[11px] font-mono uppercase tracking-widest text-mute mb-1">SkillHub Africa</p>
             <h1 className="text-[24px] font-semibold tracking-[-0.6px] text-ink-strong">Admin Dashboard</h1>
           </div>
-          <button
-            onClick={fetchData}
-            className="flex items-center gap-2 px-4 py-2 border border-hairline rounded-sm text-[13px] text-body hover:text-ink hover:border-primary/50 transition-colors"
-          >
-            <TrendingUp className="w-4 h-4" />
-            Refresh
-          </button>
+          {activeTab === 'jobs' && (
+            <button
+              onClick={openCreate}
+              className="flex items-center gap-2 px-4 py-2 border border-hairline rounded-sm text-[13px] text-body hover:text-primary hover:border-primary/50 transition-colors"
+            >
+              <Plus className="w-4 h-4" />
+              Post Job
+            </button>
+          )}
         </div>
 
         <div className="p-8">
@@ -254,21 +310,13 @@ export function AdminDashboard() {
             </div>
           )}
 
-          {/* Jobs Tab */}
           {activeTab === 'jobs' && (
             <div className="bg-canvas-soft border border-hairline rounded-sm overflow-hidden">
               <div className="px-6 py-4 border-b border-hairline flex justify-between items-center">
                 <div>
                   <h2 className="text-[16px] font-semibold text-ink-strong">All Jobs</h2>
-                  <p className="text-[13px] text-mute mt-0.5">Overview of all job listings on the platform</p>
+                  <p className="text-[13px] text-mute mt-0.5">Manage all job listings on the platform</p>
                 </div>
-                <button
-                  onClick={() => setShowJobModal(true)}
-                  className="flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary border border-primary/30 rounded-sm text-[13px] font-medium hover:bg-primary/20 transition-colors"
-                >
-                  <Plus className="w-4 h-4" />
-                  Post Job
-                </button>
               </div>
               {loading ? (
                 <div className="flex items-center justify-center py-16">
@@ -278,7 +326,7 @@ export function AdminDashboard() {
                 <table className="w-full">
                   <thead>
                     <tr className="border-b border-hairline">
-                      {['ID', 'Title', 'Status', 'Location'].map(h => (
+                      {['ID', 'Title', 'Location', 'Status', 'Actions'].map(h => (
                         <th key={h} className="px-6 py-3 text-left text-[11px] font-mono uppercase tracking-widest text-mute">{h}</th>
                       ))}
                     </tr>
@@ -294,13 +342,42 @@ export function AdminDashboard() {
                       >
                         <td className="px-6 py-4 text-[13px] font-mono text-mute">#{j.id}</td>
                         <td className="px-6 py-4 text-[14px] font-medium text-ink-strong">{j.title}</td>
+                        <td className="px-6 py-4 text-[13px] text-body">{j.location || '—'}</td>
                         <td className="px-6 py-4">
                           <span className={`text-[11px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-sm border ${
                             j.status === 'OPEN' ? 'text-primary border-primary/30 bg-primary/5' :
                             'text-mute border-hairline bg-canvas'
                           }`}>{j.status}</span>
                         </td>
-                        <td className="px-6 py-4 text-[13px] text-body">{j.location || '—'}</td>
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => openEdit(j)}
+                              title="Edit job"
+                              className="p-1.5 text-mute hover:text-primary hover:bg-primary/10 border border-hairline hover:border-primary/30 rounded-sm transition-colors"
+                            >
+                              <Pencil className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              onClick={() => handleToggleStatus(j)}
+                              title={j.status === 'OPEN' ? 'Close job' : 'Open job'}
+                              className={`p-1.5 border rounded-sm transition-colors ${
+                                j.status === 'OPEN'
+                                  ? 'text-yellow-500 border-yellow-500/30 hover:bg-yellow-500/10'
+                                  : 'text-primary border-primary/30 hover:bg-primary/10'
+                              }`}
+                            >
+                              {j.status === 'OPEN' ? <ToggleLeft className="w-3.5 h-3.5" /> : <ToggleRight className="w-3.5 h-3.5" />}
+                            </button>
+                            <button
+                              onClick={() => setConfirmDeleteId(j.id)}
+                              title="Delete job"
+                              className="p-1.5 text-mute hover:text-red-500 hover:bg-red-500/10 border border-hairline hover:border-red-500/30 rounded-sm transition-colors"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </td>
                       </motion.tr>
                     ))}
                   </tbody>
@@ -311,100 +388,144 @@ export function AdminDashboard() {
         </div>
       </main>
 
-      {/* Post Job Modal */}
-      {showJobModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-canvas/80 backdrop-blur-sm">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="w-full max-w-lg bg-canvas-soft border border-hairline rounded-sm shadow-xl"
-          >
-            <div className="flex items-center justify-between p-6 border-b border-hairline">
-              <h3 className="text-[18px] font-semibold text-ink-strong">Post New Job</h3>
-              <button
-                onClick={() => setShowJobModal(false)}
-                className="text-mute hover:text-ink transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            <form onSubmit={handlePostJob} className="p-6 space-y-4">
-              <div className="space-y-1">
-                <label className="text-[13px] font-medium text-ink">Job Title</label>
-                <input
-                  required
-                  type="text"
-                  value={newJob.title}
-                  onChange={e => setNewJob({...newJob, title: e.target.value})}
-                  className="w-full h-10 bg-canvas border border-hairline rounded-sm px-3 text-[14px] text-ink focus:border-primary focus:outline-none transition-colors"
-                  placeholder="e.g. Senior Software Engineer"
-                />
+      {/* Create / Edit Job Modal */}
+      <AnimatePresence>
+        {showJobModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-canvas/80 backdrop-blur-sm">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="w-full max-w-lg bg-canvas-soft border border-hairline rounded-sm shadow-xl"
+            >
+              <div className="flex items-center justify-between p-6 border-b border-hairline">
+                <h3 className="text-[18px] font-semibold text-ink-strong">{editingJob ? 'Edit Job' : 'Post New Job'}</h3>
+                <button onClick={() => setShowJobModal(false)} className="text-mute hover:text-ink transition-colors">
+                  <X className="w-5 h-5" />
+                </button>
               </div>
-              <div className="space-y-1">
-                <label className="text-[13px] font-medium text-ink">Description</label>
-                <textarea
-                  required
-                  value={newJob.description}
-                  onChange={e => setNewJob({...newJob, description: e.target.value})}
-                  className="w-full h-24 bg-canvas border border-hairline rounded-sm p-3 text-[14px] text-ink focus:border-primary focus:outline-none transition-colors resize-none"
-                  placeholder="Job details and requirements..."
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
+              <form onSubmit={handlePostJob} className="p-6 space-y-4">
                 <div className="space-y-1">
-                  <label className="text-[13px] font-medium text-ink">Location</label>
+                  <label className="text-[13px] font-medium text-ink">Job Title</label>
                   <input
                     required
                     type="text"
-                    value={newJob.location}
-                    onChange={e => setNewJob({...newJob, location: e.target.value})}
+                    value={jobForm.title}
+                    onChange={e => setJobForm({...jobForm, title: e.target.value})}
                     className="w-full h-10 bg-canvas border border-hairline rounded-sm px-3 text-[14px] text-ink focus:border-primary focus:outline-none transition-colors"
-                    placeholder="e.g. Dar es Salaam"
+                    placeholder="e.g. Senior Software Engineer"
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-[13px] font-medium text-ink">Duration</label>
-                  <input
+                  <label className="text-[13px] font-medium text-ink">Description</label>
+                  <textarea
                     required
-                    type="text"
-                    value={newJob.duration}
-                    onChange={e => setNewJob({...newJob, duration: e.target.value})}
-                    className="w-full h-10 bg-canvas border border-hairline rounded-sm px-3 text-[14px] text-ink focus:border-primary focus:outline-none transition-colors"
-                    placeholder="e.g. Full-time, 6 Months"
+                    value={jobForm.description}
+                    onChange={e => setJobForm({...jobForm, description: e.target.value})}
+                    className="w-full h-24 bg-canvas border border-hairline rounded-sm p-3 text-[14px] text-ink focus:border-primary focus:outline-none transition-colors resize-none"
+                    placeholder="Job details and requirements..."
                   />
                 </div>
-              </div>
-              <div className="space-y-1">
-                <label className="text-[13px] font-medium text-ink">Payment Amount (Optional)</label>
-                <input
-                  type="number"
-                  value={newJob.paymentAmount}
-                  onChange={e => setNewJob({...newJob, paymentAmount: e.target.value})}
-                  className="w-full h-10 bg-canvas border border-hairline rounded-sm px-3 text-[14px] text-ink focus:border-primary focus:outline-none transition-colors"
-                  placeholder="e.g. 1000000"
-                />
-              </div>
-              <div className="pt-4 flex justify-end gap-3">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <label className="text-[13px] font-medium text-ink">Location</label>
+                    <input
+                      type="text"
+                      value={jobForm.location}
+                      onChange={e => setJobForm({...jobForm, location: e.target.value})}
+                      className="w-full h-10 bg-canvas border border-hairline rounded-sm px-3 text-[14px] text-ink focus:border-primary focus:outline-none transition-colors"
+                      placeholder="e.g. Dar es Salaam"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[13px] font-medium text-ink">Duration</label>
+                    <input
+                      type="text"
+                      value={jobForm.duration}
+                      onChange={e => setJobForm({...jobForm, duration: e.target.value})}
+                      className="w-full h-10 bg-canvas border border-hairline rounded-sm px-3 text-[14px] text-ink focus:border-primary focus:outline-none transition-colors"
+                      placeholder="e.g. Full-time, 6 Months"
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <label className="text-[13px] font-medium text-ink">Payment Amount (Optional)</label>
+                    <input
+                      type="number"
+                      value={jobForm.paymentAmount}
+                      onChange={e => setJobForm({...jobForm, paymentAmount: e.target.value})}
+                      className="w-full h-10 bg-canvas border border-hairline rounded-sm px-3 text-[14px] text-ink focus:border-primary focus:outline-none transition-colors"
+                      placeholder="e.g. 1000000"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[13px] font-medium text-ink">Status</label>
+                    <select
+                      value={jobForm.status}
+                      onChange={e => setJobForm({...jobForm, status: e.target.value})}
+                      className="w-full h-10 bg-canvas border border-hairline rounded-sm px-3 text-[14px] text-ink focus:border-primary focus:outline-none transition-colors"
+                    >
+                      <option value="OPEN">OPEN</option>
+                      <option value="CLOSED">CLOSED</option>
+                    </select>
+                  </div>
+                </div>
+                <div className="pt-4 flex justify-end gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setShowJobModal(false)}
+                    className="px-4 py-2 border border-hairline rounded-sm text-[13px] font-medium text-body hover:text-ink transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={jobPosting}
+                    className="flex items-center gap-2 px-4 py-2 bg-primary text-canvas rounded-sm text-[13px] font-medium hover:bg-primary-soft transition-colors disabled:opacity-50"
+                  >
+                    {jobPosting ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+                    {editingJob ? 'Save Changes' : 'Post Job'}
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Delete Confirmation Dialog */}
+      <AnimatePresence>
+        {confirmDeleteId && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-canvas/80 backdrop-blur-sm">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="w-full max-w-sm bg-canvas-soft border border-hairline rounded-sm shadow-xl p-6"
+            >
+              <h3 className="text-[17px] font-semibold text-ink-strong mb-2">Delete Job?</h3>
+              <p className="text-[14px] text-body mb-6">This will permanently delete the job and all its applications. This action cannot be undone.</p>
+              <div className="flex gap-3">
                 <button
-                  type="button"
-                  onClick={() => setShowJobModal(false)}
-                  className="px-4 py-2 border border-hairline rounded-sm text-[13px] font-medium text-body hover:text-ink transition-colors"
+                  onClick={() => setConfirmDeleteId(null)}
+                  className="flex-1 py-2 border border-hairline rounded-sm text-[13px] font-medium text-body hover:text-ink transition-colors"
                 >
                   Cancel
                 </button>
                 <button
-                  type="submit"
-                  disabled={jobPosting}
-                  className="flex items-center gap-2 px-4 py-2 bg-primary text-canvas rounded-sm text-[13px] font-medium hover:bg-primary-soft transition-colors disabled:opacity-50"
+                  onClick={() => handleDeleteJob(confirmDeleteId)}
+                  disabled={deletingId === confirmDeleteId}
+                  className="flex-1 py-2 bg-red-500 text-white rounded-sm text-[13px] font-medium hover:bg-red-600 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
                 >
-                  {jobPosting ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
-                  Post Job
+                  {deletingId === confirmDeleteId ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                  Delete
                 </button>
               </div>
-            </form>
-          </motion.div>
-        </div>
-      )}
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

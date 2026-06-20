@@ -522,7 +522,7 @@ export function JobSeekerDashboard() {
       {mapJob && (
         <JobRouteMap 
           job={mapJob} 
-          userLocation={{ lat: user?.locationLat, lng: user?.locationLng }} 
+          user={user} 
           onClose={() => setMapJob(null)} 
         />
       )}
@@ -530,7 +530,58 @@ export function JobSeekerDashboard() {
   );
 }
 
-function JobRouteMap({ job, userLocation, onClose }) {
+const TANZANIA_REGIONS = {
+  'dar es salaam': { lat: -6.7924, lng: 39.2083 },
+  'dodoma': { lat: -6.1630, lng: 35.7516 },
+  'arusha': { lat: -3.3731, lng: 36.6853 },
+  'mwanza': { lat: -2.5164, lng: 32.9018 },
+  'kilimanjaro': { lat: -3.3349, lng: 37.3404 },
+  'moshi': { lat: -3.3349, lng: 37.3404 },
+  'tanga': { lat: -5.0689, lng: 39.0988 },
+  'morogoro': { lat: -6.8278, lng: 37.6591 },
+  'mbeya': { lat: -8.9094, lng: 33.4607 },
+  'iringa': { lat: -7.7731, lng: 35.6994 },
+  'kigoma': { lat: -4.8769, lng: 29.6267 },
+  'tabora': { lat: -5.0167, lng: 32.8000 },
+  'shinyanga': { lat: -3.6619, lng: 33.4219 },
+  'kagera': { lat: -1.3323, lng: 31.8106 },
+  'bukoba': { lat: -1.3323, lng: 31.8106 },
+  'mara': { lat: -1.5007, lng: 33.8047 },
+  'musoma': { lat: -1.5007, lng: 33.8047 },
+  'manyara': { lat: -4.2155, lng: 35.7487 },
+  'babati': { lat: -4.2155, lng: 35.7487 },
+  'singida': { lat: -4.8142, lng: 34.7471 },
+  'rukwa': { lat: -7.9667, lng: 31.6167 },
+  'sumbawanga': { lat: -7.9667, lng: 31.6167 },
+  'katavi': { lat: -6.3444, lng: 31.0694 },
+  'mpanda': { lat: -6.3444, lng: 31.0694 },
+  'ruvuma': { lat: -10.6833, lng: 35.6500 },
+  'songea': { lat: -10.6833, lng: 35.6500 },
+  'lindi': { lat: -9.9967, lng: 39.7144 },
+  'mtwara': { lat: -10.2736, lng: 40.1824 },
+  'pwani': { lat: -6.7833, lng: 38.9833 },
+  'kibaha': { lat: -6.7833, lng: 38.9833 },
+  'geita': { lat: -2.8722, lng: 32.2292 },
+  'simiyu': { lat: -2.8000, lng: 33.9833 },
+  'bariadi': { lat: -2.8000, lng: 33.9833 },
+  'njombe': { lat: -9.3333, lng: 34.7667 },
+  'songwe': { lat: -9.1167, lng: 32.9333 },
+  'zanzibar': { lat: -6.1659, lng: 39.2026 },
+  'pemba': { lat: -5.2284, lng: 39.7561 }
+};
+
+function getCoordsForLocation(locationStr, defaultLat = -6.7924, defaultLng = 39.2083) {
+  if (!locationStr) return { lat: defaultLat, lng: defaultLng };
+  const normalized = locationStr.toLowerCase().trim();
+  for (const [key, value] of Object.entries(TANZANIA_REGIONS)) {
+    if (normalized.includes(key)) {
+      return value;
+    }
+  }
+  return { lat: defaultLat, lng: defaultLng };
+}
+
+function JobRouteMap({ job, user, onClose }) {
   const [routeInfo, setRouteInfo] = useState(null);
   const [loadingMap, setLoadingMap] = useState(true);
   const [gpsError, setGpsError] = useState(null);
@@ -547,22 +598,38 @@ function JobRouteMap({ job, userLocation, onClose }) {
           },
           (err) => {
             console.warn("GPS access denied, falling back to registered coordinates.");
-            const lat = userLocation?.lat || -6.7924;
-            const lng = userLocation?.lng || 39.2083;
+            let lat = user?.locationLat;
+            let lng = user?.locationLng;
+            if (!lat || !lng) {
+              const coords = getCoordsForLocation(user?.region || user?.district);
+              lat = coords.lat;
+              lng = coords.lng;
+            }
             initMap(lat, lng);
           },
           { enableHighAccuracy: true, timeout: 5000 }
         );
       } else {
-        const lat = userLocation?.lat || -6.7924;
-        const lng = userLocation?.lng || 39.2083;
+        let lat = user?.locationLat;
+        let lng = user?.locationLng;
+        if (!lat || !lng) {
+          const coords = getCoordsForLocation(user?.region || user?.district);
+          lat = coords.lat;
+          lng = coords.lng;
+        }
         initMap(lat, lng);
       }
     };
 
     const initMap = (userLat, userLng) => {
-      const jobLat = job.locationLat || -6.7783; 
-      const jobLng = job.locationLng || 39.2274;
+      let jobLat = job.locationLat;
+      let jobLng = job.locationLng;
+      
+      if (!jobLat || !jobLng) {
+        const coords = getCoordsForLocation(job.location || job.region);
+        jobLat = coords.lat;
+        jobLng = coords.lng;
+      }
 
       try {
         setLoadingMap(true);

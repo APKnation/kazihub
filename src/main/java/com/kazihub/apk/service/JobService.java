@@ -112,12 +112,58 @@ public class JobService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof User) {
             User currentUser = (User) authentication.getPrincipal();
-            if (!application.getJob().getEmployer().getId().equals(currentUser.getId())) {
+            boolean isAdmin = currentUser.getAuthorities().stream()
+                    .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+            if (!isAdmin && !application.getJob().getEmployer().getId().equals(currentUser.getId())) {
                 throw new RuntimeException("Not authorized to update this application");
             }
         }
         
         application.setStatus(status);
         return jobApplicationRepository.save(application);
+    }
+
+    public Job updateJob(Long id, Job updated) {
+        Job existing = jobRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Job not found"));
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof User) {
+            User currentUser = (User) authentication.getPrincipal();
+            boolean isAdmin = currentUser.getAuthorities().stream()
+                    .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+            if (!isAdmin && !existing.getEmployer().getId().equals(currentUser.getId())) {
+                throw new RuntimeException("Not authorized to update this job");
+            }
+        }
+
+        if (updated.getTitle() != null)         existing.setTitle(updated.getTitle());
+        if (updated.getDescription() != null)   existing.setDescription(updated.getDescription());
+        if (updated.getLocation() != null)      existing.setLocation(updated.getLocation());
+        if (updated.getPaymentAmount() != null) existing.setPaymentAmount(updated.getPaymentAmount());
+        if (updated.getDuration() != null)      existing.setDuration(updated.getDuration());
+        if (updated.getStatus() != null)        existing.setStatus(updated.getStatus());
+        if (updated.getLocationLat() != null)   existing.setLocationLat(updated.getLocationLat());
+        if (updated.getLocationLng() != null)   existing.setLocationLng(updated.getLocationLng());
+
+        return jobRepository.save(existing);
+    }
+
+    public void deleteJob(Long id) {
+        Job existing = jobRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Job not found"));
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof User) {
+            User currentUser = (User) authentication.getPrincipal();
+            boolean isAdmin = currentUser.getAuthorities().stream()
+                    .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+            if (!isAdmin && !existing.getEmployer().getId().equals(currentUser.getId())) {
+                throw new RuntimeException("Not authorized to delete this job");
+            }
+        }
+
+        jobApplicationRepository.deleteByJobId(id);
+        jobRepository.deleteById(id);
     }
 }

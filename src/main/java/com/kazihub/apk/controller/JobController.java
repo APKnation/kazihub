@@ -87,4 +87,15 @@ public class JobController {
             @RequestParam com.kazihub.apk.model.ApplicationStatus status) {
         return ResponseEntity.ok(jobService.updateApplicationStatus(appId, status));
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Job> updateJob(@PathVariable Long id, @RequestBody Job job) {
+        return ResponseEntity.ok(jobService.updateJob(id, job));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteJob(@PathVariable Long id) {
+        jobService.deleteJob(id);
+        return ResponseEntity.noContent().build();
+    }
 }
