@@ -6,6 +6,7 @@ import { Login } from './pages/Auth/Login';
 import { Register } from './pages/Auth/Register';
 import { JobSeekerDashboard } from './pages/JobSeeker/Dashboard';
 import { EmployerDashboard } from './pages/Employer/Dashboard';
+import { AdminDashboard } from './pages/Admin/Dashboard';
 import { Loader2 } from 'lucide-react';
 
 // Protected route: redirects to /login if not authenticated
@@ -42,6 +43,11 @@ function Layout() {
           <Route path="/dashboard/employer" element={
             <ProtectedRoute allowedRoles={['EMPLOYER']}>
               <EmployerDashboard />
+            </ProtectedRoute>
+          } />
+          <Route path="/dashboard/admin" element={
+            <ProtectedRoute allowedRoles={['ADMIN']}>
+              <AdminDashboard />
             </ProtectedRoute>
           } />
           <Route path="*" element={<Navigate to="/" replace />} />

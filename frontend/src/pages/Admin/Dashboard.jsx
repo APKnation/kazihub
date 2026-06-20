@@ -1,0 +1,285 @@
+import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import {
+  Users, Briefcase, ShieldCheck, ShieldOff, LogOut,
+  TrendingUp, ToggleLeft, ToggleRight, Loader2, AlertCircle
+} from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import api from '../../services/api';
+
+export function AdminDashboard() {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  const [users, setUsers] = useState([]);
+  const [jobs, setJobs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [togglingId, setTogglingId] = useState(null);
+  const [activeTab, setActiveTab] = useState('users');
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const [usersRes, jobsRes] = await Promise.all([
+        api.get('/admin/users'),
+        api.get('/jobs'),
+      ]);
+      setUsers(usersRes.data);
+      setJobs(jobsRes.data);
+    } catch (err) {
+      setError('Failed to load data.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleToggleUser = async (userId) => {
+    try {
+      setTogglingId(userId);
+      const res = await api.post(`/admin/users/${userId}/toggle-status`);
+      setUsers(prev => prev.map(u => u.id === userId ? { ...u, active: res.data.active } : u));
+    } catch {
+      setError('Failed to update user status.');
+    } finally {
+      setTogglingId(null);
+    }
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
+
+  const stats = [
+    { label: 'Total Users', value: users.length, icon: Users, color: 'text-primary' },
+    { label: 'Total Jobs', value: jobs.length, icon: Briefcase, color: 'text-primary' },
+    { label: 'Active Users', value: users.filter(u => u.active).length, icon: ShieldCheck, color: 'text-primary' },
+    { label: 'Banned Users', value: users.filter(u => !u.active).length, icon: ShieldOff, color: 'text-red-400' },
+  ];
+
+  return (
+    <div className="min-h-screen bg-canvas text-ink flex">
+      {/* Sidebar */}
+      <aside className="w-64 bg-canvas-soft border-r border-hairline flex flex-col">
+        <div className="p-6 border-b border-hairline">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-sm bg-primary/10 border border-hairline flex items-center justify-center">
+              <ShieldCheck className="w-5 h-5 text-primary" />
+            </div>
+            <div>
+              <p className="text-[13px] font-mono uppercase tracking-widest text-mute">Admin Panel</p>
+              <p className="text-[15px] font-semibold text-ink-strong truncate">{user?.name}</p>
+            </div>
+          </div>
+        </div>
+
+        <nav className="flex-1 p-4 space-y-1">
+          {[
+            { id: 'users', label: 'Users', icon: Users },
+            { id: 'jobs', label: 'Jobs', icon: Briefcase },
+          ].map(tab => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-sm text-[14px] font-medium transition-colors ${
+                activeTab === tab.id
+                  ? 'bg-primary/10 text-primary border border-primary/30'
+                  : 'text-body hover:text-ink hover:bg-canvas'
+              }`}
+            >
+              <tab.icon className="w-4 h-4" />
+              {tab.label}
+            </button>
+          ))}
+        </nav>
+
+        <div className="p-4 border-t border-hairline">
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-sm text-[14px] font-medium text-body hover:text-red-400 hover:bg-red-400/5 transition-colors"
+          >
+            <LogOut className="w-4 h-4" />
+            Sign Out
+          </button>
+        </div>
+      </aside>
+
+      {/* Main content */}
+      <main className="flex-1 overflow-auto">
+        {/* Header */}
+        <div className="border-b border-hairline px-8 py-5 flex items-center justify-between">
+          <div>
+            <p className="text-[11px] font-mono uppercase tracking-widest text-mute mb-1">SkillHub Africa</p>
+            <h1 className="text-[24px] font-semibold tracking-[-0.6px] text-ink-strong">Admin Dashboard</h1>
+          </div>
+          <button
+            onClick={fetchData}
+            className="flex items-center gap-2 px-4 py-2 border border-hairline rounded-sm text-[13px] text-body hover:text-ink hover:border-primary/50 transition-colors"
+          >
+            <TrendingUp className="w-4 h-4" />
+            Refresh
+          </button>
+        </div>
+
+        <div className="p-8">
+          {error && (
+            <div className="flex items-center gap-2 p-3 rounded-sm bg-red-500/10 border border-red-500/30 text-red-400 text-sm mb-6">
+              <AlertCircle className="w-4 h-4 shrink-0" />
+              {error}
+            </div>
+          )}
+
+          {/* Stats */}
+          <div className="grid grid-cols-4 gap-4 mb-8">
+            {stats.map((stat, i) => (
+              <motion.div
+                key={stat.label}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.05 }}
+                className="bg-canvas-soft border border-hairline rounded-sm p-5"
+              >
+                <div className="flex items-center justify-between mb-3">
+                  <p className="text-[12px] font-mono uppercase tracking-widest text-mute">{stat.label}</p>
+                  <stat.icon className={`w-4 h-4 ${stat.color}`} />
+                </div>
+                <p className={`text-[32px] font-mono font-semibold ${stat.color}`}>
+                  {loading ? '—' : stat.value}
+                </p>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Users Tab */}
+          {activeTab === 'users' && (
+            <div className="bg-canvas-soft border border-hairline rounded-sm overflow-hidden">
+              <div className="px-6 py-4 border-b border-hairline">
+                <h2 className="text-[16px] font-semibold text-ink-strong">All Users</h2>
+                <p className="text-[13px] text-mute mt-0.5">Manage platform users and their access</p>
+              </div>
+              {loading ? (
+                <div className="flex items-center justify-center py-16">
+                  <Loader2 className="w-6 h-6 animate-spin text-primary" />
+                </div>
+              ) : (
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-hairline">
+                      {['ID', 'Name', 'Phone', 'Role', 'Region', 'Status', 'Action'].map(h => (
+                        <th key={h} className="px-6 py-3 text-left text-[11px] font-mono uppercase tracking-widest text-mute">{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {users.map((u, i) => (
+                      <motion.tr
+                        key={u.id}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: i * 0.03 }}
+                        className="border-b border-hairline last:border-0 hover:bg-canvas transition-colors"
+                      >
+                        <td className="px-6 py-4 text-[13px] font-mono text-mute">#{u.id}</td>
+                        <td className="px-6 py-4 text-[14px] font-medium text-ink-strong">{u.name}</td>
+                        <td className="px-6 py-4 text-[13px] font-mono text-body">{u.phone}</td>
+                        <td className="px-6 py-4">
+                          <span className={`text-[11px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-sm border ${
+                            u.role === 'ADMIN' ? 'text-primary border-primary/30 bg-primary/5' :
+                            u.role === 'EMPLOYER' ? 'text-blue-400 border-blue-400/30 bg-blue-400/5' :
+                            'text-body border-hairline bg-canvas'
+                          }`}>{u.role}</span>
+                        </td>
+                        <td className="px-6 py-4 text-[13px] text-body">{u.region || '—'}</td>
+                        <td className="px-6 py-4">
+                          <span className={`text-[11px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-sm border ${
+                            u.active
+                              ? 'text-primary border-primary/30 bg-primary/5'
+                              : 'text-red-400 border-red-400/30 bg-red-400/5'
+                          }`}>
+                            {u.active ? 'Active' : 'Banned'}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4">
+                          {u.role !== 'ADMIN' && (
+                            <button
+                              onClick={() => handleToggleUser(u.id)}
+                              disabled={togglingId === u.id}
+                              className={`flex items-center gap-1.5 text-[12px] font-medium px-3 py-1.5 rounded-sm border transition-colors ${
+                                u.active
+                                  ? 'border-red-400/30 text-red-400 hover:bg-red-400/5'
+                                  : 'border-primary/30 text-primary hover:bg-primary/5'
+                              }`}
+                            >
+                              {togglingId === u.id ? (
+                                <Loader2 className="w-3 h-3 animate-spin" />
+                              ) : u.active ? (
+                                <><ToggleLeft className="w-3 h-3" /> Ban</>
+                              ) : (
+                                <><ToggleRight className="w-3 h-3" /> Unban</>
+                              )}
+                            </button>
+                          )}
+                        </td>
+                      </motion.tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          )}
+
+          {/* Jobs Tab */}
+          {activeTab === 'jobs' && (
+            <div className="bg-canvas-soft border border-hairline rounded-sm overflow-hidden">
+              <div className="px-6 py-4 border-b border-hairline">
+                <h2 className="text-[16px] font-semibold text-ink-strong">All Jobs</h2>
+                <p className="text-[13px] text-mute mt-0.5">Overview of all job listings on the platform</p>
+              </div>
+              {loading ? (
+                <div className="flex items-center justify-center py-16">
+                  <Loader2 className="w-6 h-6 animate-spin text-primary" />
+                </div>
+              ) : (
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-hairline">
+                      {['ID', 'Title', 'Status', 'Location'].map(h => (
+                        <th key={h} className="px-6 py-3 text-left text-[11px] font-mono uppercase tracking-widest text-mute">{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {jobs.map((j, i) => (
+                      <motion.tr
+                        key={j.id}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: i * 0.03 }}
+                        className="border-b border-hairline last:border-0 hover:bg-canvas transition-colors"
+                      >
+                        <td className="px-6 py-4 text-[13px] font-mono text-mute">#{j.id}</td>
+                        <td className="px-6 py-4 text-[14px] font-medium text-ink-strong">{j.title}</td>
+                        <td className="px-6 py-4">
+                          <span className={`text-[11px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-sm border ${
+                            j.status === 'OPEN' ? 'text-primary border-primary/30 bg-primary/5' :
+                            'text-mute border-hairline bg-canvas'
+                          }`}>{j.status}</span>
+                        </td>
+                        <td className="px-6 py-4 text-[13px] text-body">{j.location || '—'}</td>
+                      </motion.tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          )}
+        </div>
+      </main>
+    </div>
+  );
+}
