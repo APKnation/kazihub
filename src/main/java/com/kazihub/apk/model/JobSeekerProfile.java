@@ -30,6 +30,13 @@ public class JobSeekerProfile {
     
     private Double rating;
 
+    private Integer age;
+
+    private String educationLevel;
+
+    @Column(columnDefinition = "TEXT")
+    private String cvText;
+
     @ManyToMany
     @JoinTable(
         name = "job_seeker_skills",

@@ -3,6 +3,7 @@ package com.kazihub.apk.service;
 import com.kazihub.apk.model.Job;
 import com.kazihub.apk.model.JobApplication;
 import com.kazihub.apk.model.JobStatus;
+import com.kazihub.apk.model.ApplicationStatus;
 import com.kazihub.apk.model.User;
 import com.kazihub.apk.repository.JobApplicationRepository;
 import com.kazihub.apk.repository.JobRepository;
@@ -102,5 +103,21 @@ public class JobService {
             return jobApplicationRepository.findByApplicantId(currentUser.getId());
         }
         return jobApplicationRepository.findAll();
+    }
+
+    public JobApplication updateApplicationStatus(Long appId, ApplicationStatus status) {
+        JobApplication application = jobApplicationRepository.findById(appId)
+                .orElseThrow(() -> new RuntimeException("Application not found"));
+        
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof User) {
+            User currentUser = (User) authentication.getPrincipal();
+            if (!application.getJob().getEmployer().getId().equals(currentUser.getId())) {
+                throw new RuntimeException("Not authorized to update this application");
+            }
+        }
+        
+        application.setStatus(status);
+        return jobApplicationRepository.save(application);
     }
 }

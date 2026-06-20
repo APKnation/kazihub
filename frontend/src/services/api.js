@@ -42,7 +42,7 @@ export const jobsAPI = {
   getAll: () => api.get('/jobs'),
   getById: (id) => api.get(`/jobs/${id}`),
   create: (data) => api.post('/jobs', data),
-  apply: (jobId) => api.post(`/jobs/${jobId}/apply`, {}),
+  apply: (jobId, data) => api.post(`/jobs/${jobId}/apply`, data || {}),
   getMyApplications: () => api.get('/jobs/my-applications'),
   getPostedJobs: () => api.get('/jobs/posted'),
   getApplicationsForJob: (jobId) => api.get(`/jobs/${jobId}/applications`),
@@ -51,10 +51,10 @@ export const jobsAPI = {
 
 // ── Profile ───────────────────────────────────────────
 export const profileAPI = {
-  getJobSeekerProfile: () => api.get('/profile/job-seeker'),
-  updateJobSeekerProfile: (data) => api.put('/profile/job-seeker', data),
-  getEmployerProfile: () => api.get('/profile/employer'),
-  updateEmployerProfile: (data) => api.put('/profile/employer', data),
+  getJobSeekerProfile: () => api.get('/profiles/job-seeker/me'),
+  updateJobSeekerProfile: (data) => api.put('/profiles/job-seeker/me', data),
+  getEmployerProfile: () => api.get('/profiles/employer'),
+  updateEmployerProfile: (data) => api.put('/profiles/employer', data),
 };
 
 // ── Skills ────────────────────────────────────────────

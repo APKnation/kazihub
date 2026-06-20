@@ -27,6 +27,16 @@ public class ProfileController {
         return ResponseEntity.ok(profileService.saveJobSeekerProfile(profile));
     }
 
+    @GetMapping("/job-seeker/me")
+    public ResponseEntity<JobSeekerProfile> getMyJobSeekerProfile() {
+        return ResponseEntity.ok(profileService.getMyJobSeekerProfile());
+    }
+
+    @PutMapping("/job-seeker/me")
+    public ResponseEntity<JobSeekerProfile> updateMyJobSeekerProfile(@RequestBody JobSeekerProfile profile) {
+        return ResponseEntity.ok(profileService.updateMyJobSeekerProfile(profile));
+    }
+
     @GetMapping("/job-seeker/{userId}")
     public ResponseEntity<JobSeekerProfile> getJobSeekerProfile(@PathVariable Long userId) {
         return profileService.getJobSeekerProfile(userId)

@@ -80,4 +80,11 @@ public class JobController {
     public ResponseEntity<List<JobApplication>> getMyApplications() {
         return ResponseEntity.ok(jobService.getMyApplications());
     }
+
+    @PutMapping("/applications/{appId}/status")
+    public ResponseEntity<JobApplication> updateApplicationStatus(
+            @PathVariable Long appId,
+            @RequestParam com.kazihub.apk.model.ApplicationStatus status) {
+        return ResponseEntity.ok(jobService.updateApplicationStatus(appId, status));
+    }
 }
