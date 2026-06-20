@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight, Star, Shield, Zap, Users, TrendingUp, Briefcase, MapPin, Clock } from 'lucide-react';
+import { ArrowRight, Star, Shield, Zap, Users, TrendingUp, Briefcase, MapPin, Clock, X, Loader2 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
 import { useAuth } from '../context/AuthContext';
@@ -10,6 +10,7 @@ export function LandingPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [jobs, setJobs] = useState([]);
+  const [mapJob, setMapJob] = useState(null);
 
   useEffect(() => {
     // Fetch open jobs
@@ -178,9 +179,18 @@ export function LandingPage() {
                   <p className="text-[14px] text-body line-clamp-3 mb-6 flex-1">
                     {job.description}
                   </p>
-                  <Button variant="primary" className="w-full" onClick={handleApplyClick}>
-                    Apply Now
-                  </Button>
+                  <div className="flex gap-2.5">
+                    <Button variant="primary" className="flex-1" onClick={handleApplyClick}>
+                      Apply Now
+                    </Button>
+                    <button
+                      onClick={() => setMapJob(job)}
+                      title="Show map directions"
+                      className="px-3.5 bg-canvas border border-hairline text-mute hover:text-primary hover:border-primary rounded-sm flex items-center justify-center transition-colors"
+                    >
+                      <MapPin className="w-4 h-4" />
+                    </button>
+                  </div>
                 </motion.div>
               ))}
             </div>
@@ -211,6 +221,212 @@ export function LandingPage() {
         </motion.div>
 
       </main>
+
+      {/* Map Directions Modal */}
+      {mapJob && (
+        <JobRouteMap 
+          job={mapJob} 
+          userLocation={user ? { lat: user.locationLat, lng: user.locationLng } : null} 
+          onClose={() => setMapJob(null)} 
+        />
+      )}
+    </div>
+  );
+}
+
+function JobRouteMap({ job, userLocation, onClose }) {
+  const [routeInfo, setRouteInfo] = useState(null);
+  const [loadingMap, setLoadingMap] = useState(true);
+  const [gpsError, setGpsError] = useState(null);
+
+  useEffect(() => {
+    let mapInstance = null;
+    let routingControl = null;
+
+    const getCoordinatesAndInit = () => {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            initMap(pos.coords.latitude, pos.coords.longitude);
+          },
+          (err) => {
+            console.warn("GPS access denied, falling back to profile coordinates.");
+            const lat = userLocation?.lat || -6.7924;
+            const lng = userLocation?.lng || 39.2083;
+            initMap(lat, lng);
+          },
+          { enableHighAccuracy: true, timeout: 5000 }
+        );
+      } else {
+        const lat = userLocation?.lat || -6.7924;
+        const lng = userLocation?.lng || 39.2083;
+        initMap(lat, lng);
+      }
+    };
+
+    const initMap = (userLat, userLng) => {
+      const jobLat = job.locationLat || -6.7783; 
+      const jobLng = job.locationLng || 39.2274;
+
+      try {
+        setLoadingMap(true);
+        mapInstance = window.L.map('routing-map', { zoomControl: false }).setView([userLat, userLng], 13);
+        window.L.control.zoom({ position: 'bottomright' }).addTo(mapInstance);
+
+        window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '© OpenStreetMap contributors'
+        }).addTo(mapInstance);
+
+        routingControl = window.L.Routing.control({
+          waypoints: [
+            window.L.latLng(userLat, userLng),
+            window.L.latLng(jobLat, jobLng)
+          ],
+          routeWhileDragging: false,
+          show: true,
+          addWaypoints: false,
+          draggableWaypoints: false,
+          fitSelectedRoutes: true,
+          lineOptions: {
+            styles: [{ color: '#0ea5e9', weight: 6, opacity: 0.8 }]
+          },
+          createMarker: function(i, waypoint, n) {
+            if (i === 0) {
+              return window.L.marker(waypoint.latLng, {
+                icon: window.L.divIcon({
+                  html: `<div style="width:20px;height:20px;background:#38bdf8;border-radius:50%;border:3px solid white;box-shadow:0 0 0 4px rgba(56,189,248,0.3);"></div>`,
+                  iconSize: [20, 20], iconAnchor: [10, 10], className: ''
+                })
+              }).bindPopup("<b>Your Location</b>");
+            } else {
+              return window.L.marker(waypoint.latLng, {
+                icon: window.L.divIcon({
+                  html: `<div style="width:20px;height:20px;background:#10b981;border-radius:50%;border:3px solid white;box-shadow:0 0 0 4px rgba(16,185,129,0.3);"></div>`,
+                  iconSize: [20, 20], iconAnchor: [10, 10], className: ''
+                })
+              }).bindPopup(`<b>${job.title}</b><br/>${job.location || 'Job Site'}`);
+            }
+          }
+        }).addTo(mapInstance);
+
+        routingControl.on('routesfound', function(e) {
+          const routes = e.routes;
+          const summary = routes[0].summary;
+          const distanceKm = (summary.totalDistance / 1000).toFixed(1);
+          const durationMin = Math.round(summary.totalTime / 60);
+          setRouteInfo({ distance: distanceKm, duration: durationMin });
+          setLoadingMap(false);
+        });
+
+        routingControl.on('routingerror', function(e) {
+          console.error("Routing error:", e);
+          setGpsError("Could not find a driving route between your location and the job location.");
+          setLoadingMap(false);
+        });
+
+      } catch (error) {
+        console.error("Error building map:", error);
+        setGpsError("Error loading maps. Make sure internet connection is active.");
+        setLoadingMap(false);
+      }
+    };
+
+    getCoordinatesAndInit();
+
+    return () => {
+      if (routingControl && mapInstance) {
+        try {
+          mapInstance.removeControl(routingControl);
+        } catch (e) {}
+      }
+      if (mapInstance) {
+        try {
+          mapInstance.remove();
+        } catch (e) {}
+      }
+    };
+  }, [job, userLocation]);
+
+  return (
+    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.95 }} 
+        animate={{ opacity: 1, scale: 1 }} 
+        className="w-full max-w-4xl bg-canvas-soft border border-hairline rounded-sm flex flex-col overflow-hidden shadow-2xl"
+      >
+        <div className="flex items-center justify-between p-4 border-b border-hairline bg-canvas">
+          <div>
+            <h3 className="text-[16px] font-semibold text-ink-strong">Directions to {job.title}</h3>
+            <p className="text-[12px] text-mute">{job.companyName || 'Employer'} — {job.location || 'Site Location'}</p>
+          </div>
+          <button onClick={onClose} className="text-mute hover:text-ink transition-colors p-1.5 hover:bg-canvas border border-hairline rounded-sm">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        <div className="grid md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-hairline">
+          <div className="md:col-span-2 relative bg-canvas">
+            <div id="routing-map" style={{ height: '450px' }} className="w-full"></div>
+            {loadingMap && (
+              <div className="absolute inset-0 bg-canvas/80 backdrop-blur-xs flex flex-col items-center justify-center gap-2">
+                <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                <p className="text-[13px] text-mute font-medium">Loading live map & routing...</p>
+              </div>
+            )}
+            {gpsError && (
+              <div className="absolute inset-0 bg-canvas/95 flex flex-col items-center justify-center p-6 text-center">
+                <div className="text-red-500 font-bold mb-2">⚠️ Routing Error</div>
+                <p className="text-[13px] text-mute max-w-sm mb-4">{gpsError}</p>
+                <button onClick={onClose} className="px-4 py-2 bg-primary text-canvas rounded-sm text-[13px]">Close Map</button>
+              </div>
+            )}
+          </div>
+
+          <div className="p-5 flex flex-col justify-between max-h-[450px] overflow-y-auto bg-canvas-soft">
+            <div className="space-y-5">
+              <h4 className="text-[12px] font-mono uppercase tracking-widest text-mute">Route Summary</h4>
+              
+              {routeInfo ? (
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-canvas p-3 border border-hairline rounded-sm">
+                    <p className="text-[11px] font-mono text-mute uppercase">Distance</p>
+                    <p className="text-[20px] font-mono font-semibold text-primary mt-1">{routeInfo.distance} km</p>
+                  </div>
+                  <div className="bg-canvas p-3 border border-hairline rounded-sm">
+                    <p className="text-[11px] font-mono text-mute uppercase">Est. Time</p>
+                    <p className="text-[20px] font-mono font-semibold text-emerald-400 mt-1">{routeInfo.duration} mins</p>
+                  </div>
+                </div>
+              ) : (
+                <div className="py-4 text-[13px] text-mute text-center">Calculating route...</div>
+              )}
+
+              <div className="border-t border-hairline pt-4 font-sans">
+                <h5 className="text-[12px] font-mono uppercase tracking-widest text-mute mb-2">Locations</h5>
+                <div className="space-y-3.5 relative pl-4 before:absolute before:left-1.5 before:top-2 before:bottom-2 before:w-0.5 before:bg-hairline">
+                  <div className="relative">
+                    <div className="absolute -left-4 top-1.5 w-2 h-2 rounded-full bg-primary ring-4 ring-primary/20"></div>
+                    <p className="text-[11px] font-mono text-mute uppercase leading-none">Starting Point</p>
+                    <p className="text-[13px] font-medium text-ink-strong mt-0.5">Your Location (GPS)</p>
+                  </div>
+                  <div className="relative">
+                    <div className="absolute -left-4 top-1.5 w-2 h-2 rounded-full bg-emerald-400 ring-4 ring-emerald-400/20"></div>
+                    <p className="text-[11px] font-mono text-mute uppercase leading-none">Destination</p>
+                    <p className="text-[13px] font-medium text-ink-strong mt-0.5">{job.title}</p>
+                    <p className="text-[12px] text-mute mt-0.5">{job.location || 'Job Site'}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-4 border-t border-hairline mt-6 font-sans">
+              <p className="text-[11px] text-mute leading-normal">
+                Directions are calculated using real-time open-source street data. Follow traffic laws and walk or drive safely.
+              </p>
+            </div>
+          </div>
+        </div>
+      </motion.div>
     </div>
   );
 }
