@@ -10,6 +10,7 @@ import { Briefcase, MapPin, Clock, CheckCircle, XCircle, Loader2, LogOut, User }
 
 const statusIcon = { PENDING: Clock, ACCEPTED: CheckCircle, REJECTED: XCircle };
 const statusColor = { PENDING: 'text-yellow-400', ACCEPTED: 'text-emerald-400', REJECTED: 'text-red-400' };
+const statusBg = { PENDING: 'bg-yellow-400/10', ACCEPTED: 'bg-emerald-400/10', REJECTED: 'bg-red-400/10' };
 
 export function JobSeekerDashboard() {
   const { user, logout } = useAuth();

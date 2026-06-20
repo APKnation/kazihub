@@ -62,7 +62,19 @@ public class JobService {
         return jobRepository.findById(id);
     }
 
-    public JobApplication applyForJob(JobApplication application) {
+    public JobApplication applyForJob(Long jobId, JobApplication application) {
+        Job job = jobRepository.findById(jobId)
+                .orElseThrow(() -> new RuntimeException("Job not found"));
+        
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof User) {
+            User currentUser = (User) authentication.getPrincipal();
+            application.setApplicant(currentUser);
+        } else {
+            throw new RuntimeException("User not authenticated");
+        }
+        
+        application.setJob(job);
         return jobApplicationRepository.save(application);
     }
 

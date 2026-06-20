@@ -18,7 +18,6 @@ export function Register() {
   // Location data
   const [regions, setRegions] = useState([]);
   const [districts, setDistricts] = useState([]);
-  const [wards, setWards] = useState([]);
   const [selectedRegion, setSelectedRegion] = useState('');
   const [selectedDistrict, setSelectedDistrict] = useState('');
   const [loadingLocations, setLoadingLocations] = useState(false);
@@ -46,7 +45,6 @@ export function Register() {
     const loadDistricts = async () => {
       if (!selectedRegion) {
         setDistricts([]);
-        setWards([]);
         setSelectedDistrict('');
         setForm(prev => ({ ...prev, district: '', ward: '' }));
         return;
@@ -55,7 +53,6 @@ export function Register() {
         setLoadingLocations(true);
         const response = await locationAPI.getDistricts(selectedRegion);
         setDistricts(response.data);
-        setWards([]);
         setSelectedDistrict('');
         setForm(prev => ({ ...prev, district: '', ward: '' }));
       } catch (err) {
@@ -67,27 +64,7 @@ export function Register() {
     loadDistricts();
   }, [selectedRegion]);
 
-  // Load wards when district changes
-  useEffect(() => {
-    const loadWards = async () => {
-      if (!selectedDistrict) {
-        setWards([]);
-        setForm(prev => ({ ...prev, ward: '' }));
-        return;
-      }
-      try {
-        setLoadingLocations(true);
-        const response = await locationAPI.getWards(selectedDistrict);
-        setWards(response.data);
-        setForm(prev => ({ ...prev, ward: '' }));
-      } catch (err) {
-        console.error('Failed to load wards:', err);
-      } finally {
-        setLoadingLocations(false);
-      }
-    };
-    loadWards();
-  }, [selectedDistrict]);
+
 
   const handleRegionChange = (e) => {
     const regionId = e.target.value;
@@ -103,11 +80,7 @@ export function Register() {
     setForm(prev => ({ ...prev, district: selectedDistrictData?.name || '' }));
   };
 
-  const handleWardChange = (e) => {
-    const wardId = e.target.value;
-    const selectedWardData = wards.find(w => w.id === parseInt(wardId));
-    setForm(prev => ({ ...prev, ward: selectedWardData?.name || '' }));
-  };
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -231,24 +204,15 @@ export function Register() {
                 </div>
                 <div className="col-span-2 space-y-2">
                   <label className="text-[14px] font-semibold text-ink">Ward</label>
-                  <div className="relative">
-                    <select
-                      name="ward"
-                      value={form.ward}
-                      onChange={handleWardChange}
-                      className={`${inputClass} appearance-none cursor-pointer ${!selectedDistrict ? 'opacity-50 cursor-not-allowed' : ''}`}
-                      disabled={!selectedDistrict}
-                      required
-                    >
-                      <option value="">Select Ward</option>
-                      {wards.map((ward) => (
-                        <option key={ward.id} value={ward.id}>
-                          {ward.name}
-                        </option>
-                      ))}
-                    </select>
-                    <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-mute pointer-events-none" />
-                  </div>
+                  <input 
+                    name="ward" 
+                    type="text" 
+                    value={form.ward} 
+                    onChange={handleChange} 
+                    className={inputClass} 
+                    placeholder="e.g. Kijitonyama" 
+                    required 
+                  />
                 </div>
               </div>
 

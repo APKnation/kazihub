@@ -1,9 +1,30 @@
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight, Star, Shield, Zap, Users, TrendingUp, Briefcase } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { ArrowRight, Star, Shield, Zap, Users, TrendingUp, Briefcase, MapPin, Clock } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
+import { useAuth } from '../context/AuthContext';
+import api from '../services/api';
 
 export function LandingPage() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const [jobs, setJobs] = useState([]);
+
+  useEffect(() => {
+    // Fetch open jobs
+    api.get('/jobs/status/OPEN')
+      .then(res => setJobs(res.data.slice(0, 6))) // Show latest 6 jobs
+      .catch(console.error);
+  }, []);
+
+  const handleApplyClick = () => {
+    if (user) {
+      navigate(user.role === 'JOB_SEEKER' ? '/dashboard/job-seeker' : '/');
+    } else {
+      navigate('/login');
+    }
+  };
   return (
     <div className="min-h-screen pt-20 flex flex-col items-center justify-center bg-canvas relative overflow-hidden">
       
@@ -76,8 +97,9 @@ export function LandingPage() {
         {/* Features Grid */}
         <motion.div 
           initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.5 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.7 }}
           className="mt-32 grid grid-cols-1 md:grid-cols-3 gap-6 w-full"
         >
           {[
@@ -99,6 +121,71 @@ export function LandingPage() {
             </motion.div>
           ))}
         </motion.div>
+
+        {/* Latest Jobs Section */}
+        {jobs.length > 0 && (
+          <motion.div 
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7 }}
+            className="mt-32 w-full text-left"
+          >
+            <div className="flex flex-col md:flex-row justify-between items-end mb-12">
+              <div>
+                <h2 className="text-[36px] leading-[40px] tracking-[-0.9px] text-ink-strong mb-4">Latest Opportunities</h2>
+                <p className="text-[18px] text-body max-w-2xl">Discover open positions and apply to join top companies.</p>
+              </div>
+              <Button variant="outline" className="mt-6 md:mt-0 gap-2">
+                View All Jobs <ArrowRight className="w-4 h-4" />
+              </Button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {jobs.map((job, i) => (
+                <motion.div
+                  key={job.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.1 }}
+                  className="bg-canvas-soft border border-hairline rounded-md p-6 flex flex-col hover:border-primary/50 transition-colors group"
+                >
+                  <div className="flex justify-between items-start mb-4">
+                    <div className="w-12 h-12 bg-canvas border border-hairline rounded-sm flex items-center justify-center text-primary group-hover:scale-105 transition-transform">
+                      <Briefcase className="w-5 h-5" />
+                    </div>
+                    <span className="text-[12px] font-mono text-mute px-2 py-1 border border-hairline rounded-sm">
+                      {job.duration || 'Full-time'}
+                    </span>
+                  </div>
+                  <h3 className="text-[18px] font-semibold text-ink-strong mb-2 truncate" title={job.title}>
+                    {job.title}
+                  </h3>
+                  <div className="flex items-center gap-4 text-[13px] text-body mb-6">
+                    {job.location && (
+                      <span className="flex items-center gap-1">
+                        <MapPin className="w-3.5 h-3.5" />
+                        {job.location}
+                      </span>
+                    )}
+                    {job.paymentAmount > 0 && (
+                      <span className="flex items-center gap-1 text-primary">
+                        Tsh {job.paymentAmount.toLocaleString()}
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-[14px] text-body line-clamp-3 mb-6 flex-1">
+                    {job.description}
+                  </p>
+                  <Button variant="primary" className="w-full" onClick={handleApplyClick}>
+                    Apply Now
+                  </Button>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+        )}
 
         {/* CTA Section */}
         <motion.div 

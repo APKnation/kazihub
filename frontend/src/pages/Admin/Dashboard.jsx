@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
   Users, Briefcase, ShieldCheck, ShieldOff, LogOut,
-  TrendingUp, ToggleLeft, ToggleRight, Loader2, AlertCircle
+  TrendingUp, ToggleLeft, ToggleRight, Loader2, AlertCircle, Plus, X
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -17,6 +17,11 @@ export function AdminDashboard() {
   const [error, setError] = useState('');
   const [togglingId, setTogglingId] = useState(null);
   const [activeTab, setActiveTab] = useState('users');
+  
+  // Job posting state
+  const [showJobModal, setShowJobModal] = useState(false);
+  const [newJob, setNewJob] = useState({ title: '', description: '', location: '', paymentAmount: '', duration: '' });
+  const [jobPosting, setJobPosting] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -47,6 +52,22 @@ export function AdminDashboard() {
       setError('Failed to update user status.');
     } finally {
       setTogglingId(null);
+    }
+  };
+
+  const handlePostJob = async (e) => {
+    e.preventDefault();
+    setJobPosting(true);
+    setError('');
+    try {
+      const res = await api.post('/jobs', newJob);
+      setJobs([res.data, ...jobs]);
+      setShowJobModal(false);
+      setNewJob({ title: '', description: '', location: '', paymentAmount: '', duration: '' });
+    } catch (err) {
+      setError('Failed to post job.');
+    } finally {
+      setJobPosting(false);
     }
   };
 
@@ -236,9 +257,18 @@ export function AdminDashboard() {
           {/* Jobs Tab */}
           {activeTab === 'jobs' && (
             <div className="bg-canvas-soft border border-hairline rounded-sm overflow-hidden">
-              <div className="px-6 py-4 border-b border-hairline">
-                <h2 className="text-[16px] font-semibold text-ink-strong">All Jobs</h2>
-                <p className="text-[13px] text-mute mt-0.5">Overview of all job listings on the platform</p>
+              <div className="px-6 py-4 border-b border-hairline flex justify-between items-center">
+                <div>
+                  <h2 className="text-[16px] font-semibold text-ink-strong">All Jobs</h2>
+                  <p className="text-[13px] text-mute mt-0.5">Overview of all job listings on the platform</p>
+                </div>
+                <button
+                  onClick={() => setShowJobModal(true)}
+                  className="flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary border border-primary/30 rounded-sm text-[13px] font-medium hover:bg-primary/20 transition-colors"
+                >
+                  <Plus className="w-4 h-4" />
+                  Post Job
+                </button>
               </div>
               {loading ? (
                 <div className="flex items-center justify-center py-16">
@@ -280,6 +310,101 @@ export function AdminDashboard() {
           )}
         </div>
       </main>
+
+      {/* Post Job Modal */}
+      {showJobModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-canvas/80 backdrop-blur-sm">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="w-full max-w-lg bg-canvas-soft border border-hairline rounded-sm shadow-xl"
+          >
+            <div className="flex items-center justify-between p-6 border-b border-hairline">
+              <h3 className="text-[18px] font-semibold text-ink-strong">Post New Job</h3>
+              <button
+                onClick={() => setShowJobModal(false)}
+                className="text-mute hover:text-ink transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <form onSubmit={handlePostJob} className="p-6 space-y-4">
+              <div className="space-y-1">
+                <label className="text-[13px] font-medium text-ink">Job Title</label>
+                <input
+                  required
+                  type="text"
+                  value={newJob.title}
+                  onChange={e => setNewJob({...newJob, title: e.target.value})}
+                  className="w-full h-10 bg-canvas border border-hairline rounded-sm px-3 text-[14px] text-ink focus:border-primary focus:outline-none transition-colors"
+                  placeholder="e.g. Senior Software Engineer"
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-[13px] font-medium text-ink">Description</label>
+                <textarea
+                  required
+                  value={newJob.description}
+                  onChange={e => setNewJob({...newJob, description: e.target.value})}
+                  className="w-full h-24 bg-canvas border border-hairline rounded-sm p-3 text-[14px] text-ink focus:border-primary focus:outline-none transition-colors resize-none"
+                  placeholder="Job details and requirements..."
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="text-[13px] font-medium text-ink">Location</label>
+                  <input
+                    required
+                    type="text"
+                    value={newJob.location}
+                    onChange={e => setNewJob({...newJob, location: e.target.value})}
+                    className="w-full h-10 bg-canvas border border-hairline rounded-sm px-3 text-[14px] text-ink focus:border-primary focus:outline-none transition-colors"
+                    placeholder="e.g. Dar es Salaam"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-[13px] font-medium text-ink">Duration</label>
+                  <input
+                    required
+                    type="text"
+                    value={newJob.duration}
+                    onChange={e => setNewJob({...newJob, duration: e.target.value})}
+                    className="w-full h-10 bg-canvas border border-hairline rounded-sm px-3 text-[14px] text-ink focus:border-primary focus:outline-none transition-colors"
+                    placeholder="e.g. Full-time, 6 Months"
+                  />
+                </div>
+              </div>
+              <div className="space-y-1">
+                <label className="text-[13px] font-medium text-ink">Payment Amount (Optional)</label>
+                <input
+                  type="number"
+                  value={newJob.paymentAmount}
+                  onChange={e => setNewJob({...newJob, paymentAmount: e.target.value})}
+                  className="w-full h-10 bg-canvas border border-hairline rounded-sm px-3 text-[14px] text-ink focus:border-primary focus:outline-none transition-colors"
+                  placeholder="e.g. 1000000"
+                />
+              </div>
+              <div className="pt-4 flex justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => setShowJobModal(false)}
+                  className="px-4 py-2 border border-hairline rounded-sm text-[13px] font-medium text-body hover:text-ink transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={jobPosting}
+                  className="flex items-center gap-2 px-4 py-2 bg-primary text-canvas rounded-sm text-[13px] font-medium hover:bg-primary-soft transition-colors disabled:opacity-50"
+                >
+                  {jobPosting ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+                  Post Job
+                </button>
+              </div>
+            </form>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 }

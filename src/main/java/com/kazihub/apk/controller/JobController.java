@@ -54,10 +54,11 @@ public class JobController {
     }
 
     @PostMapping("/{jobId}/apply")
-    public ResponseEntity<JobApplication> applyForJob(@PathVariable Long jobId, @RequestBody JobApplication application) {
-        // Here we ideally should set the job to the application
-        // But assuming the client passes the proper IDs or JSON structure
-        return ResponseEntity.ok(jobService.applyForJob(application));
+    public ResponseEntity<JobApplication> applyForJob(@PathVariable Long jobId, @RequestBody(required = false) JobApplication application) {
+        if (application == null) {
+            application = new JobApplication();
+        }
+        return ResponseEntity.ok(jobService.applyForJob(jobId, application));
     }
 
     @GetMapping("/{jobId}/applications")
