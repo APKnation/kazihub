@@ -27,7 +27,7 @@ function Layout() {
   const location = window.location.pathname;
   const isDashboard = location.startsWith('/dashboard');
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col selection:bg-primary/30">
+    <div className="min-h-screen bg-canvas text-ink flex flex-col selection:bg-primary/30">
       {!isDashboard && <Navbar />}
       <div className="flex-1">
         <Routes>

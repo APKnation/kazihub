@@ -6,8 +6,7 @@ const Card = forwardRef(({ className, glass = false, children, ...props }, ref) 
     <div
       ref={ref}
       className={cn(
-        'rounded-xl border shadow-lg overflow-hidden transition-all duration-300',
-        glass ? 'glass' : 'bg-card border-border',
+        'rounded-md border border-hairline bg-canvas-soft overflow-hidden transition-all duration-300',
         className
       )}
       {...props}
@@ -26,14 +25,14 @@ const CardHeader = ({ className, children, ...props }) => (
 CardHeader.displayName = 'CardHeader';
 
 const CardTitle = ({ className, children, ...props }) => (
-  <h3 className={cn('text-xl font-semibold leading-none tracking-tight text-foreground', className)} {...props}>
+  <h3 className={cn('text-[24px] font-semibold leading-[32px] tracking-[-0.6px] text-ink-strong', className)} {...props}>
     {children}
   </h3>
 );
 CardTitle.displayName = 'CardTitle';
 
 const CardContent = ({ className, children, ...props }) => (
-  <div className={cn('p-6 pt-0 text-foreground/80', className)} {...props}>
+  <div className={cn('p-6 pt-0 text-body text-[16px]', className)} {...props}>
     {children}
   </div>
 );
