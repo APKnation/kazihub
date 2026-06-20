@@ -174,7 +174,7 @@ export function Register() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="col-span-2 space-y-2">
                   <label className="text-[14px] font-semibold text-ink">Full Name</label>
-                  <input name="name" type="text" value={form.name} onChange={handleChange} className={inputClass} placeholder="John Doe" required />
+                  <input name="name" type="text" value={form.name} onChange={handleChange} className={inputClass} required />
                 </div>
                 <div className="space-y-2">
                   <label className="text-[14px] font-semibold text-ink">Phone</label>

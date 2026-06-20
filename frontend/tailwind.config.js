@@ -7,27 +7,19 @@ export default {
   theme: {
     extend: {
       colors: {
-        primary: {
-          DEFAULT: '#00d992',
-          soft: '#2fd6a1',
-          deep: '#10b981',
-        },
+        primary: '#00d992',
+        'primary-soft': '#2fd6a1',
+        'primary-deep': '#10b981',
         'on-primary': '#101010',
-        canvas: {
-          DEFAULT: '#101010',
-          soft: '#1a1a1a',
-          'text-soft': '#f5f6f7',
-        },
-        ink: {
-          DEFAULT: '#f2f2f2',
-          strong: '#ffffff',
-        },
+        canvas: '#101010',
+        'canvas-soft': '#1a1a1a',
+        'canvas-text-soft': '#f5f6f7',
+        ink: '#f2f2f2',
+        'ink-strong': '#ffffff',
         body: '#bdbdbd',
         mute: '#8b949e',
-        hairline: {
-          DEFAULT: '#3d3a39',
-          soft: '#b8b3b0',
-        },
+        hairline: '#3d3a39',
+        'hairline-soft': '#b8b3b0',
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
