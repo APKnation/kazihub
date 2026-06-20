@@ -45,13 +45,22 @@ public class ProfileService {
     public JobSeekerProfile updateMyJobSeekerProfile(JobSeekerProfile updateRequest) {
         JobSeekerProfile currentProfile = getMyJobSeekerProfile();
         
+        System.out.println("DEBUG Profile Update Request Received:");
+        System.out.println("  Age: " + updateRequest.getAge());
+        System.out.println("  Education Level: " + updateRequest.getEducationLevel());
+        System.out.println("  Experience: " + updateRequest.getExperience());
+        System.out.println("  Portfolio URL: " + updateRequest.getPortfolioUrl());
+        System.out.println("  CV Text: " + (updateRequest.getCvText() != null ? (updateRequest.getCvText().length() + " chars") : "null"));
+        
         currentProfile.setExperience(updateRequest.getExperience());
         currentProfile.setPortfolioUrl(updateRequest.getPortfolioUrl());
         currentProfile.setAge(updateRequest.getAge());
         currentProfile.setEducationLevel(updateRequest.getEducationLevel());
         currentProfile.setCvText(updateRequest.getCvText());
         
-        return jobSeekerProfileRepository.save(currentProfile);
+        JobSeekerProfile saved = jobSeekerProfileRepository.save(currentProfile);
+        System.out.println("DEBUG Profile Saved: ID=" + saved.getId() + ", User=" + saved.getUser().getName());
+        return saved;
     }
 
     public EmployerProfile saveEmployerProfile(EmployerProfile profile) {
