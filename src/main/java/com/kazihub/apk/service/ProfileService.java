@@ -45,11 +45,11 @@ public class ProfileService {
     public JobSeekerProfile updateMyJobSeekerProfile(JobSeekerProfile updateRequest) {
         JobSeekerProfile currentProfile = getMyJobSeekerProfile();
         
-        if (updateRequest.getExperience() != null) currentProfile.setExperience(updateRequest.getExperience());
-        if (updateRequest.getPortfolioUrl() != null) currentProfile.setPortfolioUrl(updateRequest.getPortfolioUrl());
-        if (updateRequest.getAge() != null) currentProfile.setAge(updateRequest.getAge());
-        if (updateRequest.getEducationLevel() != null) currentProfile.setEducationLevel(updateRequest.getEducationLevel());
-        if (updateRequest.getCvText() != null) currentProfile.setCvText(updateRequest.getCvText());
+        currentProfile.setExperience(updateRequest.getExperience());
+        currentProfile.setPortfolioUrl(updateRequest.getPortfolioUrl());
+        currentProfile.setAge(updateRequest.getAge());
+        currentProfile.setEducationLevel(updateRequest.getEducationLevel());
+        currentProfile.setCvText(updateRequest.getCvText());
         
         return jobSeekerProfileRepository.save(currentProfile);
     }

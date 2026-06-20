@@ -76,7 +76,23 @@ export function JobSeekerDashboard() {
     e.preventDefault();
     setUpdatingProfile(true);
     try {
-      await profileAPI.updateJobSeekerProfile(profile);
+      const payload = {
+        age: profile.age === '' ? null : parseInt(profile.age, 10),
+        educationLevel: profile.educationLevel || null,
+        experience: profile.experience || null,
+        portfolioUrl: profile.portfolioUrl || null,
+        cvText: profile.cvText || null
+      };
+      const res = await profileAPI.updateJobSeekerProfile(payload);
+      if (res.data) {
+        setProfile({
+          age: res.data.age || '',
+          educationLevel: res.data.educationLevel || '',
+          experience: res.data.experience || '',
+          portfolioUrl: res.data.portfolioUrl || '',
+          cvText: res.data.cvText || ''
+        });
+      }
       alert('Profile updated successfully!');
     } catch (err) {
       alert('Failed to update profile.');
