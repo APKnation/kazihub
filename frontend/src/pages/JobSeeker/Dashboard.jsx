@@ -105,22 +105,25 @@ export function JobSeekerDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-canvas text-ink flex">
+    <div className="min-h-screen bg-canvas text-ink flex flex-col md:flex-row">
       {/* Sidebar */}
-      <aside className="w-64 bg-canvas-soft border-r border-hairline flex flex-col">
-        <div className="p-6 border-b border-hairline">
+      <aside className="w-full md:w-64 bg-canvas-soft border-b md:border-b-0 md:border-r border-hairline flex flex-col shrink-0">
+        <div className="p-4 md:p-6 border-b border-hairline flex items-center justify-between md:block">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-sm bg-primary/10 border border-hairline flex items-center justify-center">
+            <div className="w-10 h-10 rounded-sm bg-primary/10 border border-hairline flex items-center justify-center shrink-0">
               <Briefcase className="w-5 h-5 text-primary" />
             </div>
-            <div>
+            <div className="min-w-0">
               <p className="text-[13px] font-mono uppercase tracking-widest text-mute">Job Seeker</p>
               <p className="text-[15px] font-semibold text-ink-strong truncate">{user?.name}</p>
             </div>
           </div>
+          <button onClick={handleLogout} className="md:hidden p-2 text-mute hover:text-red-400 transition-colors rounded-sm border border-hairline bg-canvas">
+            <LogOut className="w-4 h-4" />
+          </button>
         </div>
 
-        <nav className="flex-1 p-4 space-y-1">
+        <nav className="flex-none md:flex-1 p-3 md:p-4 flex md:flex-col overflow-x-auto gap-2 md:gap-1 space-y-0 md:space-y-1">
           {[
             { id: 'browse', label: 'Browse Jobs', icon: Briefcase },
             { id: 'applications', label: 'My Applications', icon: CheckCircle },
@@ -129,27 +132,27 @@ export function JobSeekerDashboard() {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-sm text-[14px] font-medium transition-colors ${
+              className={`whitespace-nowrap md:w-full flex items-center gap-3 px-3 py-2.5 rounded-sm text-[14px] font-medium transition-colors ${
                 activeTab === tab.id
                   ? 'bg-primary/10 text-primary border border-primary/30'
                   : 'text-body hover:text-ink hover:bg-canvas'
               }`}
             >
-              <tab.icon className="w-4 h-4" />
+              <tab.icon className="w-4 h-4 shrink-0" />
               {tab.label}
               {tab.id === 'applications' && applications.length > 0 && (
-                <span className="ml-auto bg-primary/20 text-primary text-[10px] px-2 py-0.5 rounded-full font-mono">{applications.length}</span>
+                <span className="ml-2 md:ml-auto bg-primary/20 text-primary text-[10px] px-2 py-0.5 rounded-full font-mono">{applications.length}</span>
               )}
             </button>
           ))}
         </nav>
 
-        <div className="p-4 border-t border-hairline">
+        <div className="hidden md:block p-4 border-t border-hairline">
           <button
             onClick={handleLogout}
             className="w-full flex items-center gap-3 px-3 py-2.5 rounded-sm text-[14px] font-medium text-body hover:text-red-400 hover:bg-red-400/5 transition-colors"
           >
-            <LogOut className="w-4 h-4" />
+            <LogOut className="w-4 h-4 shrink-0" />
             Sign Out
           </button>
         </div>
@@ -168,7 +171,7 @@ export function JobSeekerDashboard() {
           {error && <div className="text-red-400 text-sm mb-6 p-3 bg-red-500/10 rounded-sm border border-red-500/20">{error}</div>}
 
           {/* Stats */}
-          <div className="grid grid-cols-3 gap-4 mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
             {[
               { label: 'Available Jobs', value: jobs.length, color: 'text-primary', icon: Briefcase },
               { label: 'Applications Sent', value: applications.length, color: 'text-primary', icon: CheckCircle },
@@ -397,7 +400,7 @@ export function JobSeekerDashboard() {
       </h2>
 
       <form onSubmit={handleUpdateProfile} className="space-y-5">
-        <div className="grid grid-cols-2 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           <div className="space-y-1.5">
             <label className="text-[13px] font-medium text-ink">Age (Optional)</label>
             <input
@@ -633,6 +636,10 @@ function JobRouteMap({ job, user, onClose }) {
 
       try {
         setLoadingMap(true);
+        const container = window.L.DomUtil.get('routing-map');
+        if (container != null) {
+          container._leaflet_id = null;
+        }
         mapInstance = window.L.map('routing-map', { zoomControl: false }).setView([userLat, userLng], 13);
         window.L.control.zoom({ position: 'bottomright' }).addTo(mapInstance);
 
@@ -641,6 +648,9 @@ function JobRouteMap({ job, user, onClose }) {
         }).addTo(mapInstance);
 
         routingControl = window.L.Routing.control({
+          router: window.L.Routing.osrmv1({
+            serviceUrl: 'https://routing.openstreetmap.de/routed-car/route/v1'
+          }),
           waypoints: [
             window.L.latLng(userLat, userLng),
             window.L.latLng(jobLat, jobLng)
@@ -715,9 +725,9 @@ function JobRouteMap({ job, user, onClose }) {
       <motion.div 
         initial={{ opacity: 0, scale: 0.95 }} 
         animate={{ opacity: 1, scale: 1 }} 
-        className="w-full max-w-4xl bg-canvas-soft border border-hairline rounded-sm flex flex-col overflow-hidden shadow-2xl"
+        className="w-full max-w-4xl bg-canvas-soft border border-hairline rounded-sm flex flex-col overflow-hidden shadow-2xl max-h-[90vh]"
       >
-        <div className="flex items-center justify-between p-4 border-b border-hairline bg-canvas">
+        <div className="flex items-center justify-between p-4 border-b border-hairline bg-canvas shrink-0">
           <div>
             <h3 className="text-[16px] font-semibold text-ink-strong">Directions to {job.title}</h3>
             <p className="text-[12px] text-mute">{job.companyName || 'Employer'} — {job.location || 'Site Location'}</p>
@@ -727,9 +737,9 @@ function JobRouteMap({ job, user, onClose }) {
           </button>
         </div>
 
-        <div className="grid md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-hairline">
+        <div className="grid md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-hairline overflow-y-auto">
           <div className="md:col-span-2 relative bg-canvas">
-            <div id="routing-map" style={{ height: '450px' }} className="w-full"></div>
+            <div id="routing-map" className="w-full h-[300px] md:h-[450px]"></div>
             {loadingMap && (
               <div className="absolute inset-0 bg-canvas/80 backdrop-blur-xs flex flex-col items-center justify-center gap-2">
                 <Loader2 className="w-8 h-8 animate-spin text-primary" />

@@ -138,22 +138,25 @@ export function AdminDashboard() {
   ];
 
   return (
-    <div className="min-h-screen bg-canvas text-ink flex">
+    <div className="min-h-screen bg-canvas text-ink flex flex-col md:flex-row">
       {/* Sidebar */}
-      <aside className="w-64 bg-canvas-soft border-r border-hairline flex flex-col">
-        <div className="p-6 border-b border-hairline">
+      <aside className="w-full md:w-64 bg-canvas-soft border-b md:border-b-0 md:border-r border-hairline flex flex-col shrink-0">
+        <div className="p-4 md:p-6 border-b border-hairline flex items-center justify-between md:block">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-sm bg-primary/10 border border-hairline flex items-center justify-center">
+            <div className="w-10 h-10 rounded-sm bg-primary/10 border border-hairline flex items-center justify-center shrink-0">
               <ShieldCheck className="w-5 h-5 text-primary" />
             </div>
-            <div>
+            <div className="min-w-0">
               <p className="text-[13px] font-mono uppercase tracking-widest text-mute">Admin Panel</p>
               <p className="text-[15px] font-semibold text-ink-strong truncate">{user?.name}</p>
             </div>
           </div>
+          <button onClick={handleLogout} className="md:hidden p-2 text-mute hover:text-red-400 transition-colors rounded-sm border border-hairline bg-canvas">
+            <LogOut className="w-4 h-4" />
+          </button>
         </div>
 
-        <nav className="flex-1 p-4 space-y-1">
+        <nav className="flex-none md:flex-1 p-3 md:p-4 flex md:flex-col overflow-x-auto gap-2 md:gap-1 space-y-0 md:space-y-1">
           {[
             { id: 'users', label: 'Users', icon: Users },
             { id: 'jobs', label: 'Jobs', icon: Briefcase },
@@ -161,24 +164,24 @@ export function AdminDashboard() {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-sm text-[14px] font-medium transition-colors ${
+              className={`whitespace-nowrap md:w-full flex items-center gap-3 px-3 py-2.5 rounded-sm text-[14px] font-medium transition-colors ${
                 activeTab === tab.id
                   ? 'bg-primary/10 text-primary border border-primary/30'
                   : 'text-body hover:text-ink hover:bg-canvas'
               }`}
             >
-              <tab.icon className="w-4 h-4" />
+              <tab.icon className="w-4 h-4 shrink-0" />
               {tab.label}
             </button>
           ))}
         </nav>
 
-        <div className="p-4 border-t border-hairline">
+        <div className="hidden md:block p-4 border-t border-hairline">
           <button
             onClick={handleLogout}
             className="w-full flex items-center gap-3 px-3 py-2.5 rounded-sm text-[14px] font-medium text-body hover:text-red-400 hover:bg-red-400/5 transition-colors"
           >
-            <LogOut className="w-4 h-4" />
+            <LogOut className="w-4 h-4 shrink-0" />
             Sign Out
           </button>
         </div>
@@ -212,7 +215,7 @@ export function AdminDashboard() {
           )}
 
           {/* Stats */}
-          <div className="grid grid-cols-4 gap-4 mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
             {stats.map((stat, i) => (
               <motion.div
                 key={stat.label}
@@ -244,9 +247,10 @@ export function AdminDashboard() {
                   <Loader2 className="w-6 h-6 animate-spin text-primary" />
                 </div>
               ) : (
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b border-hairline">
+                <div className="overflow-x-auto w-full">
+                  <table className="w-full min-w-[700px]">
+                    <thead>
+                      <tr className="border-b border-hairline">
                       {['ID', 'Name', 'Phone', 'Role', 'Region', 'Status', 'Action'].map(h => (
                         <th key={h} className="px-6 py-3 text-left text-[11px] font-mono uppercase tracking-widest text-mute">{h}</th>
                       ))}
@@ -306,6 +310,7 @@ export function AdminDashboard() {
                     ))}
                   </tbody>
                 </table>
+                </div>
               )}
             </div>
           )}
@@ -323,9 +328,10 @@ export function AdminDashboard() {
                   <Loader2 className="w-6 h-6 animate-spin text-primary" />
                 </div>
               ) : (
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b border-hairline">
+                <div className="overflow-x-auto w-full">
+                  <table className="w-full min-w-[600px]">
+                    <thead>
+                      <tr className="border-b border-hairline">
                       {['ID', 'Title', 'Location', 'Status', 'Actions'].map(h => (
                         <th key={h} className="px-6 py-3 text-left text-[11px] font-mono uppercase tracking-widest text-mute">{h}</th>
                       ))}
@@ -382,6 +388,7 @@ export function AdminDashboard() {
                     ))}
                   </tbody>
                 </table>
+                </div>
               )}
             </div>
           )}
@@ -396,7 +403,7 @@ export function AdminDashboard() {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="w-full max-w-lg bg-canvas-soft border border-hairline rounded-sm shadow-xl"
+              className="w-[95%] sm:w-full max-w-lg bg-canvas-soft border border-hairline rounded-sm shadow-xl max-h-[90vh] overflow-y-auto"
             >
               <div className="flex items-center justify-between p-6 border-b border-hairline">
                 <h3 className="text-[18px] font-semibold text-ink-strong">{editingJob ? 'Edit Job' : 'Post New Job'}</h3>
@@ -426,7 +433,7 @@ export function AdminDashboard() {
                     placeholder="Job details and requirements..."
                   />
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-1">
                     <label className="text-[13px] font-medium text-ink">Location</label>
                     <input
@@ -448,7 +455,7 @@ export function AdminDashboard() {
                     />
                   </div>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-1">
                     <label className="text-[13px] font-medium text-ink">Payment Amount (Optional)</label>
                     <input
@@ -502,7 +509,7 @@ export function AdminDashboard() {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="w-full max-w-sm bg-canvas-soft border border-hairline rounded-sm shadow-xl p-6"
+              className="w-[95%] sm:w-full max-w-sm bg-canvas-soft border border-hairline rounded-sm shadow-xl p-6"
             >
               <h3 className="text-[17px] font-semibold text-ink-strong mb-2">Delete Job?</h3>
               <p className="text-[14px] text-body mb-6">This will permanently delete the job and all its applications. This action cannot be undone.</p>

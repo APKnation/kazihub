@@ -29,50 +29,92 @@ export function LandingPage() {
   return (
     <div className="min-h-screen pt-20 flex flex-col items-center justify-center bg-canvas relative overflow-hidden">
       
-      <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 flex flex-col items-center text-center">
-        
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="font-mono text-[14px] font-semibold tracking-[2.52px] text-primary uppercase mb-8 inline-flex items-center gap-2"
-        >
-          <span className="flex h-2 w-2 rounded-full bg-primary animate-pulse"></span>
-          EVERYTHING YOU NEED TO HIRE
-        </motion.div>
+      <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 flex flex-col">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center w-full">
+          {/* Left Column: Text & CTAs */}
+          <div className="text-left flex flex-col items-start order-2 lg:order-2">
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="font-mono text-[14px] font-semibold tracking-[2.52px] text-primary uppercase mb-6 inline-flex items-center gap-2 bg-primary/10 px-4 py-2 rounded-full"
+            >
+          
+            </motion.div>
 
-        <motion.h1 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-          className="text-[48px] md:text-[60px] leading-[1.1] md:leading-[60px] font-normal tracking-[-0.65px] text-ink-strong mb-6 max-w-4xl"
-        >
-          Find Your Dream Job.<br />
-          Hire Top Talent.
-        </motion.h1>
+            <motion.h1 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              className="text-[48px] md:text-[64px] leading-[1.1] md:leading-[68px] font-normal tracking-[-0.65px] text-ink-strong mb-6 max-w-2xl"
+            >
+              Find Your Dream Job.<br />
+              <span className="text-primary">Hire Top Talent.</span>
+            </motion.h1>
 
-        <motion.p 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          className="text-[16px] md:text-[18px] leading-[26px] md:leading-[28px] text-body max-w-2xl mb-10"
-        >
-          SkillHub Africa is the premier platform connecting skilled professionals with innovative companies. Accelerate your career or build your dream team today.
-        </motion.p>
+            <motion.p 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="text-[16px] md:text-[18px] leading-[26px] md:leading-[28px] text-body max-w-lg mb-10"
+            >
+              SkillHub Africa is the premier platform connecting skilled professionals with innovative companies. Accelerate your career or build your dream team today.
+            </motion.p>
 
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-          className="flex flex-col sm:flex-row gap-4"
-        >
-          <Button variant="primary" size="lg" className="gap-2">
-            Explore Jobs <ArrowRight className="w-5 h-5" />
-          </Button>
-          <Button variant="outline" size="lg">
-            Post a Job
-          </Button>
-        </motion.div>
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+              className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto"
+            >
+              <Button 
+                variant="primary" 
+                size="lg" 
+                className="gap-2 w-full sm:w-auto justify-center"
+                onClick={() => document.getElementById('jobs-section')?.scrollIntoView({ behavior: 'smooth' })}
+              >
+                Explore Jobs <ArrowRight className="w-5 h-5" />
+              </Button>
+              <Button 
+                variant="outline" 
+                size="lg" 
+                className="w-full sm:w-auto justify-center"
+                onClick={() => navigate('/register')}
+              >
+                Post a Job
+              </Button>
+            </motion.div>
+          </div>
+
+          {/* Right Column: Image Presentation */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95, x: -20 }}
+            animate={{ opacity: 1, scale: 1, x: 0 }}
+            transition={{ duration: 0.7, delay: 0.2 }}
+            className="relative w-full h-full flex justify-center lg:justify-start mt-12 lg:mt-0 order-1 lg:order-1"
+          >
+            <div className="relative w-full max-w-md lg:max-w-full aspect-[4/5] lg:aspect-auto lg:h-[600px] rounded-3xl overflow-hidden shadow-2xl border border-hairline/50">
+              <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-transparent mix-blend-overlay z-10"></div>
+              <img 
+                src="/vijana.png" 
+                alt="Young Professionals" 
+                className="w-full h-full object-cover object-top"
+              />
+              
+              {/* Floating Decorative Element */}
+              <motion.div 
+                animate={{ y: [0, -10, 0] }}
+                transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
+                className="absolute bottom-8 left-[-1rem] lg:-left-12 bg-canvas p-4 rounded-xl shadow-xl border border-hairline flex items-center gap-4 z-20"
+              >
+               
+              </motion.div>
+            </div>
+            
+            {/* Background Blob Effect */}
+            <div className="absolute -z-10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-primary/5 blur-3xl rounded-full"></div>
+          </motion.div>
+        </div>
 
         {/* Stats Section */}
         <motion.div 
@@ -126,6 +168,7 @@ export function LandingPage() {
         {/* Latest Jobs Section */}
         {jobs.length > 0 && (
           <motion.div 
+            id="jobs-section"
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -337,6 +380,10 @@ function JobRouteMap({ job, user, onClose }) {
 
       try {
         setLoadingMap(true);
+        const container = window.L.DomUtil.get('routing-map');
+        if (container != null) {
+          container._leaflet_id = null;
+        }
         mapInstance = window.L.map('routing-map', { zoomControl: false }).setView([userLat, userLng], 13);
         window.L.control.zoom({ position: 'bottomright' }).addTo(mapInstance);
 
@@ -345,6 +392,9 @@ function JobRouteMap({ job, user, onClose }) {
         }).addTo(mapInstance);
 
         routingControl = window.L.Routing.control({
+          router: window.L.Routing.osrmv1({
+            serviceUrl: 'https://routing.openstreetmap.de/routed-car/route/v1'
+          }),
           waypoints: [
             window.L.latLng(userLat, userLng),
             window.L.latLng(jobLat, jobLng)
