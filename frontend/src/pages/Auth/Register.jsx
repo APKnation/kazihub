@@ -246,6 +246,7 @@ export function Register() {
                           {ward.name}
                         </option>
                       ))}
+                    </select>
                     <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-mute pointer-events-none" />
                   </div>
                 </div>
