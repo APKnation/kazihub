@@ -26,17 +26,17 @@ public class DataSeeder implements CommandLineRunner {
     }
 
     private void seedAdminUser() {
-        if (!userRepository.existsByPhone("admin@kazihub.com") && !userRepository.existsByEmail("admin@kazihub.com")) {
+        if (!userRepository.existsByPhone("0741019426")) {
             User admin = User.builder()
                     .name("Super Admin")
-                    .phone("0741019426") // using email as phone placeholder for admin
+                    .phone("0741019426")
                     .email("admin@kazihub.com")
                     .password(passwordEncoder.encode("1234"))
                     .role(Role.ADMIN)
                     .active(true)
                     .build();
             userRepository.save(admin);
-            System.out.println("Default Admin user created. Login: admin@kazihub.com / admin123");
+            System.out.println("Default Admin user created. Phone: 0741019426 / Password: 1234");
         }
     }
 

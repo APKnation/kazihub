@@ -18,6 +18,9 @@ export function Login() {
     e.preventDefault();
     setError('');
     setLoading(true);
+    // Clear any stale tokens before attempting login
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
     try {
       const user = await login({ phone, password });
       // Role-based redirect after login
