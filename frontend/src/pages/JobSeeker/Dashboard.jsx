@@ -118,9 +118,6 @@ export function JobSeekerDashboard() {
               <p className="text-[15px] font-semibold text-ink-strong truncate">{user?.name}</p>
             </div>
           </div>
-          <button onClick={handleLogout} className="md:hidden p-2 text-mute hover:text-red-400 transition-colors rounded-sm border border-hairline bg-canvas">
-            <LogOut className="w-4 h-4" />
-          </button>
         </div>
 
         <nav className="flex-none md:flex-1 p-3 md:p-4 flex md:flex-col overflow-x-auto gap-2 md:gap-1 space-y-0 md:space-y-1">
@@ -145,17 +142,14 @@ export function JobSeekerDashboard() {
               )}
             </button>
           ))}
-        </nav>
-
-        <div className="hidden md:block p-4 border-t border-hairline">
           <button
             onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-sm text-[14px] font-medium text-body hover:text-red-400 hover:bg-red-400/5 transition-colors"
+            className="whitespace-nowrap md:w-full flex items-center gap-3 px-3 py-2.5 rounded-sm text-[14px] font-medium text-body hover:text-red-400 hover:bg-red-400/5 transition-colors"
           >
             <LogOut className="w-4 h-4 shrink-0" />
             Sign Out
           </button>
-        </div>
+        </nav>
       </aside>
 
       {/* Main content */}
